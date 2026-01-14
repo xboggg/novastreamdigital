@@ -4,6 +4,8 @@ import { ArrowRight, ArrowLeft, Check, Send } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 const serviceOptions = [
   { id: 'website', label: 'Website Design', icon: '🌐' },
@@ -40,6 +42,8 @@ const Contact = () => {
     referral: '',
   });
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
 
   const toggleService = (id: string) => {
     setFormData(prev => ({
@@ -50,10 +54,27 @@ const Contact = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    setSubmitted(true);
+    setIsSubmitting(true);
+    
+    const { error } = await supabase.from('leads').insert({
+      name: formData.name,
+      email: formData.email,
+      company: formData.company || null,
+      services: formData.services,
+      message: formData.description,
+      budget: formData.budget,
+      timeline: formData.timeline,
+      referral_source: formData.referral || null,
+    });
+
+    if (error) {
+      toast({ variant: 'destructive', title: 'Error', description: 'Failed to submit. Please try again.' });
+      setIsSubmitting(false);
+    } else {
+      setSubmitted(true);
+    }
   };
 
   const canProceed = () => {
@@ -324,9 +345,9 @@ const Contact = () => {
                   type="submit"
                   variant="hero"
                   size="lg"
-                  disabled={!canProceed()}
+                  disabled={!canProceed() || isSubmitting}
                 >
-                  Submit Request
+                  {isSubmitting ? 'Submitting...' : 'Submit Request'}
                   <Send className="w-4 h-4 ml-2" />
                 </Button>
               )}
