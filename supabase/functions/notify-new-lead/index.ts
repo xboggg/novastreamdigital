@@ -104,7 +104,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send notification to admin
     const adminEmail = await sendEmail(
-      ["admin@novastreamdigital.com"], // Replace with actual admin email
+      ["novastreamdig@gmail.com"],
       `New Lead: ${lead.name} from ${lead.company || 'Unknown Company'}`,
       adminHtml
     );
