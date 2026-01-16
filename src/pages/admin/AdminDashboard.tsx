@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { FolderKanban, FileText, MessageSquare, Users, ArrowRight, TrendingUp } from 'lucide-react';
+import { FolderKanban, FileText, MessageSquare, Users, ArrowRight, TrendingUp, Mail } from 'lucide-react';
 import AdminLayout from './AdminLayout';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -11,6 +11,7 @@ interface Stats {
   testimonials: number;
   leads: number;
   newLeads: number;
+  subscribers: number;
 }
 
 const AdminDashboard = () => {
@@ -20,6 +21,7 @@ const AdminDashboard = () => {
     testimonials: 0,
     leads: 0,
     newLeads: 0,
+    subscribers: 0,
   });
   const [recentLeads, setRecentLeads] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -27,12 +29,13 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [projectsRes, postsRes, testimonialsRes, leadsRes, newLeadsRes] = await Promise.all([
+        const [projectsRes, postsRes, testimonialsRes, leadsRes, newLeadsRes, subscribersRes] = await Promise.all([
           supabase.from('projects').select('id', { count: 'exact', head: true }),
           supabase.from('posts').select('id', { count: 'exact', head: true }),
           supabase.from('testimonials').select('id', { count: 'exact', head: true }),
           supabase.from('leads').select('id', { count: 'exact', head: true }),
           supabase.from('leads').select('id', { count: 'exact', head: true }).eq('status', 'new'),
+          supabase.from('newsletter_subscribers').select('id', { count: 'exact', head: true }).eq('status', 'active'),
         ]);
 
         setStats({
@@ -41,6 +44,7 @@ const AdminDashboard = () => {
           testimonials: testimonialsRes.count || 0,
           leads: leadsRes.count || 0,
           newLeads: newLeadsRes.count || 0,
+          subscribers: subscribersRes.count || 0,
         });
 
         // Fetch recent leads
@@ -66,6 +70,7 @@ const AdminDashboard = () => {
     { icon: FileText, label: 'Blog Posts', value: stats.posts, path: '/admin/posts', color: 'from-violet-500 to-purple-500' },
     { icon: MessageSquare, label: 'Testimonials', value: stats.testimonials, path: '/admin/testimonials', color: 'from-emerald-500 to-teal-500' },
     { icon: Users, label: 'Leads', value: stats.leads, path: '/admin/leads', color: 'from-rose-500 to-pink-500', badge: stats.newLeads > 0 ? `${stats.newLeads} new` : undefined },
+    { icon: Mail, label: 'Subscribers', value: stats.subscribers, path: '/admin/newsletter', color: 'from-amber-500 to-orange-500' },
   ];
 
   if (isLoading) {
