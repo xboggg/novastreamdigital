@@ -1,6 +1,6 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Pencil, Trash2, Eye, EyeOff, Star, StarOff, Upload, X, Copy, GripVertical, CheckSquare, Square } from 'lucide-react';
+import { Plus, Pencil, Trash2, Eye, EyeOff, Star, StarOff, Upload, X, Copy, GripVertical, CheckSquare, Square, Search, Filter } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import AdminLayout from './AdminLayout';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,21 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface Project {
   id: string;
@@ -29,6 +44,8 @@ interface Project {
   display_order: number | null;
 }
 
+const ITEMS_PER_PAGE = 10;
+
 const AdminProjects = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -37,6 +54,13 @@ const AdminProjects = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [draggedId, setDraggedId] = useState<string | null>(null);
+  
+  // Search and filter state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'draft'>('all');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -68,6 +92,39 @@ const AdminProjects = () => {
   useEffect(() => {
     fetchProjects();
   }, []);
+
+  // Get unique categories for filter
+  const categories = useMemo(() => {
+    const cats = projects.map(p => p.category).filter(Boolean) as string[];
+    return [...new Set(cats)];
+  }, [projects]);
+
+  // Filter and search projects
+  const filteredProjects = useMemo(() => {
+    return projects.filter(project => {
+      const matchesSearch = searchQuery === '' || 
+        project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        project.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        project.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+      
+      const matchesStatus = statusFilter === 'all' || project.status === statusFilter;
+      const matchesCategory = categoryFilter === 'all' || project.category === categoryFilter;
+      
+      return matchesSearch && matchesStatus && matchesCategory;
+    });
+  }, [projects, searchQuery, statusFilter, categoryFilter]);
+
+  // Paginate filtered projects
+  const totalPages = Math.ceil(filteredProjects.length / ITEMS_PER_PAGE);
+  const paginatedProjects = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredProjects.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredProjects, currentPage]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, statusFilter, categoryFilter]);
 
   const resetForm = () => {
     setFormData({
@@ -376,7 +433,7 @@ const AdminProjects = () => {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold">Projects</h1>
-          <p className="text-muted-foreground mt-1">Manage your portfolio projects</p>
+          <p className="text-muted-foreground mt-1">Manage your portfolio projects ({filteredProjects.length} of {projects.length})</p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) resetForm(); }}>
           <DialogTrigger asChild>
@@ -535,12 +592,56 @@ const AdminProjects = () => {
         </Dialog>
       </div>
 
+      {/* Search and Filter Bar */}
+      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Search by title, category, or tags..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-secondary border border-border focus:border-primary transition-colors"
+          />
+        </div>
+        <div className="flex gap-2">
+          <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as typeof statusFilter)}>
+            <SelectTrigger className="w-[130px]">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="published">Published</SelectItem>
+              <SelectItem value="draft">Draft</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <SelectTrigger className="w-[150px]">
+              <SelectValue placeholder="Category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Categories</SelectItem>
+              {categories.map(cat => (
+                <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
       {projects.length === 0 ? (
         <div className="card-premium p-12 text-center">
           <p className="text-muted-foreground mb-4">No projects yet</p>
           <Button variant="outline" onClick={() => setIsDialogOpen(true)}>
             <Plus className="w-4 h-4 mr-2" />
             Create your first project
+          </Button>
+        </div>
+      ) : filteredProjects.length === 0 ? (
+        <div className="card-premium p-12 text-center">
+          <p className="text-muted-foreground mb-4">No projects match your search</p>
+          <Button variant="outline" onClick={() => { setSearchQuery(''); setStatusFilter('all'); setCategoryFilter('all'); }}>
+            Clear filters
           </Button>
         </div>
       ) : (
@@ -551,12 +652,12 @@ const AdminProjects = () => {
               onClick={selectAll}
               className="flex items-center gap-2 text-sm hover:text-primary transition-colors"
             >
-              {selectedIds.size === projects.length ? (
+              {selectedIds.size === paginatedProjects.length ? (
                 <CheckSquare className="w-4 h-4" />
               ) : (
                 <Square className="w-4 h-4" />
               )}
-              {selectedIds.size === projects.length ? 'Deselect All' : 'Select All'}
+              {selectedIds.size === paginatedProjects.length ? 'Deselect All' : 'Select All'}
             </button>
             
             {selectedIds.size > 0 && (
@@ -587,7 +688,7 @@ const AdminProjects = () => {
           </div>
 
           <div className="grid gap-2">
-            {projects.map((project, index) => (
+            {paginatedProjects.map((project, index) => (
               <motion.div
                 key={project.id}
                 initial={{ opacity: 0, y: 10 }}
@@ -682,6 +783,39 @@ const AdminProjects = () => {
               </motion.div>
             ))}
           </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="mt-6">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    />
+                  </PaginationItem>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                    <PaginationItem key={page}>
+                      <PaginationLink
+                        onClick={() => setCurrentPage(page)}
+                        isActive={currentPage === page}
+                        className="cursor-pointer"
+                      >
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+                  <PaginationItem>
+                    <PaginationNext 
+                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                      className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
         </>
       )}
     </AdminLayout>
