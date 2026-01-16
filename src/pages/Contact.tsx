@@ -58,7 +58,7 @@ const Contact = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    const { error } = await supabase.from('leads').insert({
+    const leadData = {
       name: formData.name,
       email: formData.email,
       company: formData.company || null,
@@ -67,12 +67,23 @@ const Contact = () => {
       budget: formData.budget,
       timeline: formData.timeline,
       referral_source: formData.referral || null,
-    });
+    };
+
+    const { error } = await supabase.from('leads').insert(leadData);
 
     if (error) {
       toast({ variant: 'destructive', title: 'Error', description: 'Failed to submit. Please try again.' });
       setIsSubmitting(false);
     } else {
+      // Send email notification (fire and forget)
+      try {
+        await supabase.functions.invoke('notify-new-lead', {
+          body: leadData,
+        });
+      } catch (emailError) {
+        console.error('Email notification failed:', emailError);
+        // Don't block form submission if email fails
+      }
       setSubmitted(true);
     }
   };
