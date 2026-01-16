@@ -272,6 +272,48 @@ export type Database = {
         }
         Relationships: []
       }
+      social_posts: {
+        Row: {
+          created_at: string
+          display_order: number | null
+          embed_id: string
+          id: string
+          is_featured: boolean | null
+          platform: string
+          status: Database["public"]["Enums"]["content_status"]
+          thumbnail_url: string | null
+          title: string | null
+          updated_at: string
+          video_url: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number | null
+          embed_id: string
+          id?: string
+          is_featured?: boolean | null
+          platform: string
+          status?: Database["public"]["Enums"]["content_status"]
+          thumbnail_url?: string | null
+          title?: string | null
+          updated_at?: string
+          video_url: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number | null
+          embed_id?: string
+          id?: string
+          is_featured?: boolean | null
+          platform?: string
+          status?: Database["public"]["Enums"]["content_status"]
+          thumbnail_url?: string | null
+          title?: string | null
+          updated_at?: string
+          video_url?: string
+        }
+        Relationships: []
+      }
       testimonials: {
         Row: {
           avatar_url: string | null
