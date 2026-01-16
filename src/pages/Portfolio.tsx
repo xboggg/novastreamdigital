@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { ExternalLink } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,6 +14,7 @@ interface Project {
   description: string | null;
   category: string | null;
   image_url: string | null;
+  website_url: string | null;
 }
 
 const Portfolio = () => {
@@ -25,7 +27,7 @@ const Portfolio = () => {
     const fetchProjects = async () => {
       const { data, error } = await supabase
         .from('projects')
-        .select('id, title, slug, description, category, image_url')
+        .select('id, title, slug, description, category, image_url, website_url')
         .eq('status', 'published')
         .order('display_order', { ascending: true });
 
@@ -153,6 +155,18 @@ const Portfolio = () => {
                       <p className="text-sm text-muted-foreground mt-1">
                         {project.description}
                       </p>
+                      {project.website_url && (
+                        <a
+                          href={project.website_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="inline-flex items-center gap-1 text-sm text-primary hover:underline mt-2"
+                        >
+                          <ExternalLink className="h-3 w-3" />
+                          Visit Site
+                        </a>
+                      )}
                     </div>
                   </Link>
                 </motion.div>

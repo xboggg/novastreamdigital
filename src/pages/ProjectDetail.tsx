@@ -104,9 +104,21 @@ const ProjectDetail = () => {
               {project.title}
             </h1>
             {project.description && (
-              <p className="text-xl text-muted-foreground">
+              <p className="text-xl text-muted-foreground mb-6">
                 {project.description}
               </p>
+            )}
+            {project.website_url && (
+              <Button asChild>
+                <a
+                  href={project.website_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <ExternalLink className="mr-2 h-4 w-4" />
+                  Visit Live Site
+                </a>
+              </Button>
             )}
           </motion.header>
 
@@ -153,7 +165,20 @@ const ProjectDetail = () => {
             className="prose prose-lg dark:prose-invert max-w-none"
           >
             {project.content ? (
-              <div dangerouslySetInnerHTML={{ __html: project.content }} />
+              <div className="space-y-6">
+                {project.content.split('\n').map((line: string, index: number) => {
+                  if (line.startsWith('## ')) {
+                    return <h2 key={index} className="text-2xl font-bold mt-8 mb-4">{line.replace('## ', '')}</h2>;
+                  } else if (line.startsWith('### ')) {
+                    return <h3 key={index} className="text-xl font-semibold mt-6 mb-3 text-primary">{line.replace('### ', '')}</h3>;
+                  } else if (line.startsWith('- ')) {
+                    return <li key={index} className="ml-4 text-muted-foreground">{line.replace('- ', '')}</li>;
+                  } else if (line.trim()) {
+                    return <p key={index} className="text-muted-foreground leading-relaxed">{line}</p>;
+                  }
+                  return null;
+                })}
+              </div>
             ) : (
               <p className="text-muted-foreground">
                 No detailed case study available for this project yet.
