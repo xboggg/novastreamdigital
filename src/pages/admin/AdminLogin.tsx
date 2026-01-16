@@ -11,7 +11,8 @@ const AdminLogin = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn } = useAuth();
+  const [isSignUp, setIsSignUp] = useState(false);
+  const { signIn, signUp } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -20,20 +21,38 @@ const AdminLogin = () => {
     setIsLoading(true);
 
     try {
-      const { error } = await signIn(email, password);
-      
-      if (error) {
-        toast({
-          variant: 'destructive',
-          title: 'Login failed',
-          description: error.message,
-        });
+      if (isSignUp) {
+        const { error } = await signUp(email, password);
+        
+        if (error) {
+          toast({
+            variant: 'destructive',
+            title: 'Sign up failed',
+            description: error.message,
+          });
+        } else {
+          toast({
+            title: 'Account created!',
+            description: 'You can now sign in with your credentials.',
+          });
+          setIsSignUp(false);
+        }
       } else {
-        toast({
-          title: 'Welcome back!',
-          description: 'You have been successfully logged in.',
-        });
-        navigate('/admin');
+        const { error } = await signIn(email, password);
+        
+        if (error) {
+          toast({
+            variant: 'destructive',
+            title: 'Login failed',
+            description: error.message,
+          });
+        } else {
+          toast({
+            title: 'Welcome back!',
+            description: 'You have been successfully logged in.',
+          });
+          navigate('/admin');
+        }
       }
     } catch (err) {
       toast({
@@ -58,9 +77,9 @@ const AdminLogin = () => {
           <div className="w-16 h-16 mx-auto mb-4 rounded-2xl gradient-bg flex items-center justify-center">
             <Lock className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-2xl font-bold">Admin Login</h1>
+          <h1 className="text-2xl font-bold">{isSignUp ? 'Create Account' : 'Admin Login'}</h1>
           <p className="text-muted-foreground mt-2">
-            Sign in to access the admin dashboard
+            {isSignUp ? 'Create an account to get started' : 'Sign in to access the admin dashboard'}
           </p>
         </div>
 
@@ -103,8 +122,18 @@ const AdminLogin = () => {
           </div>
 
           <Button type="submit" variant="hero" size="lg" className="w-full" disabled={isLoading}>
-            {isLoading ? 'Signing in...' : 'Sign In'}
+            {isLoading ? (isSignUp ? 'Creating account...' : 'Signing in...') : (isSignUp ? 'Create Account' : 'Sign In')}
           </Button>
+          
+          <div className="text-center">
+            <button
+              type="button"
+              onClick={() => setIsSignUp(!isSignUp)}
+              className="text-sm text-primary hover:underline"
+            >
+              {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
+            </button>
+          </div>
         </form>
 
         <p className="text-center text-sm text-muted-foreground mt-6">
