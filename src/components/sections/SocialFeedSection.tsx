@@ -59,7 +59,8 @@ const platformConfig: Record<Platform, { label: string; icon: React.ReactNode; g
 // Track click (when user clicks on a post thumbnail)
 const trackClick = async (postId: string) => {
   try {
-    await supabase.rpc('increment_social_post_click', { post_id: postId });
+    // Use raw SQL via RPC - types will be updated after migration
+    await (supabase.rpc as any)('increment_social_post_click', { post_id: postId });
   } catch (error) {
     // Silent fail - don't interrupt user experience
     console.error('Failed to track click:', error);
@@ -69,7 +70,8 @@ const trackClick = async (postId: string) => {
 // Track view (when user watches the video in modal)
 const trackView = async (postId: string) => {
   try {
-    await supabase.rpc('increment_social_post_view', { post_id: postId });
+    // Use raw SQL via RPC - types will be updated after migration
+    await (supabase.rpc as any)('increment_social_post_view', { post_id: postId });
   } catch (error) {
     // Silent fail - don't interrupt user experience
     console.error('Failed to track view:', error);
