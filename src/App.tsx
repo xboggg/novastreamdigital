@@ -9,8 +9,10 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Services from "./pages/Services";
 import Portfolio from "./pages/Portfolio";
+import ProjectDetail from "./pages/ProjectDetail";
 import About from "./pages/About";
 import Insights from "./pages/Insights";
+import PostDetail from "./pages/PostDetail";
 import Contact from "./pages/Contact";
 import Pricing from "./pages/Pricing";
 import NotFound from "./pages/NotFound";
@@ -36,8 +38,10 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/services" element={<Services />} />
               <Route path="/portfolio" element={<Portfolio />} />
+              <Route path="/portfolio/:slug" element={<ProjectDetail />} />
               <Route path="/about" element={<About />} />
               <Route path="/insights" element={<Insights />} />
+              <Route path="/insights/:slug" element={<PostDetail />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/admin/login" element={<AdminLogin />} />
