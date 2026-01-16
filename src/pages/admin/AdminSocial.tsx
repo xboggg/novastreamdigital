@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import AdminLayout from './AdminLayout';
@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import {
   Dialog,
@@ -46,8 +47,19 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Pencil, Trash2, Star, ExternalLink, Loader2, HelpCircle, Upload, Grid, List, Image } from 'lucide-react';
+import { 
+  Plus, Pencil, Trash2, Star, ExternalLink, Loader2, HelpCircle, Upload, 
+  Grid, List, Image, GripVertical, Eye, MousePointer, ChevronDown 
+} from 'lucide-react';
 
 type Platform = 'tiktok' | 'youtube' | 'instagram' | 'facebook';
 type ContentStatus = 'draft' | 'published';
@@ -64,6 +76,8 @@ interface SocialPost {
   display_order: number;
   status: ContentStatus;
   created_at: string;
+  view_count?: number;
+  click_count?: number;
 }
 
 const platformConfig: Record<Platform, { label: string; color: string; bgColor: string }> = {
@@ -72,6 +86,8 @@ const platformConfig: Record<Platform, { label: string; color: string; bgColor: 
   instagram: { label: 'Instagram', color: 'text-pink-500', bgColor: 'bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 text-white' },
   facebook: { label: 'Facebook', color: 'text-blue-500', bgColor: 'bg-blue-600 text-white' },
 };
+
+const POSTS_PER_PAGE = 10;
 
 // URL parsing functions
 const parseVideoUrl = (url: string): { platform: Platform | null; embedId: string | null; thumbnailUrl: string | null } => {
@@ -125,6 +141,9 @@ const AdminSocial = () => {
   const [platformFilter, setPlatformFilter] = useState<'all' | Platform>('all');
   const [viewMode, setViewMode] = useState<ViewMode>('table');
   const [isUploading, setIsUploading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedPosts, setSelectedPosts] = useState<Set<string>>(new Set());
+  const [draggedPost, setDraggedPost] = useState<SocialPost | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     platform: '' as Platform | '',
@@ -218,6 +237,61 @@ const AdminSocial = () => {
     },
   });
 
+  const reorderMutation = useMutation({
+    mutationFn: async (updates: { id: string; display_order: number }[]) => {
+      for (const update of updates) {
+        const { error } = await supabase
+          .from('social_posts')
+          .update({ display_order: update.display_order })
+          .eq('id', update.id);
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['social-posts'] });
+      toast({ title: 'Success', description: 'Order updated successfully.' });
+    },
+    onError: () => {
+      toast({ title: 'Error', description: 'Failed to update order.', variant: 'destructive' });
+    },
+  });
+
+  const bulkStatusMutation = useMutation({
+    mutationFn: async ({ ids, status }: { ids: string[]; status: ContentStatus }) => {
+      const { error } = await supabase
+        .from('social_posts')
+        .update({ status })
+        .in('id', ids);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['social-posts'] });
+      setSelectedPosts(new Set());
+      toast({ title: 'Success', description: 'Posts updated successfully.' });
+    },
+    onError: () => {
+      toast({ title: 'Error', description: 'Failed to update posts.', variant: 'destructive' });
+    },
+  });
+
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (ids: string[]) => {
+      const { error } = await supabase
+        .from('social_posts')
+        .delete()
+        .in('id', ids);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['social-posts'] });
+      setSelectedPosts(new Set());
+      toast({ title: 'Success', description: 'Posts deleted successfully.' });
+    },
+    onError: () => {
+      toast({ title: 'Error', description: 'Failed to delete posts.', variant: 'destructive' });
+    },
+  });
+
   const resetForm = () => {
     setFormData({
       platform: '',
@@ -239,7 +313,6 @@ const AdminSocial = () => {
         video_url: url,
         platform, 
         embed_id: embedId,
-        // Auto-fill thumbnail for YouTube
         thumbnail_url: thumbnailUrl && !prev.thumbnail_url ? thumbnailUrl : prev.thumbnail_url,
       }));
     }
@@ -249,13 +322,11 @@ const AdminSocial = () => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.type.startsWith('image/')) {
       toast({ title: 'Error', description: 'Please select an image file.', variant: 'destructive' });
       return;
     }
 
-    // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast({ title: 'Error', description: 'Image must be less than 5MB.', variant: 'destructive' });
       return;
@@ -318,9 +389,82 @@ const AdminSocial = () => {
     }
   };
 
+  // Drag and drop handlers
+  const handleDragStart = (post: SocialPost) => {
+    setDraggedPost(post);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (targetPost: SocialPost) => {
+    if (!draggedPost || draggedPost.id === targetPost.id) return;
+
+    const sortedPosts = [...posts].sort((a, b) => a.display_order - b.display_order);
+    const draggedIndex = sortedPosts.findIndex(p => p.id === draggedPost.id);
+    const targetIndex = sortedPosts.findIndex(p => p.id === targetPost.id);
+
+    const newPosts = [...sortedPosts];
+    newPosts.splice(draggedIndex, 1);
+    newPosts.splice(targetIndex, 0, draggedPost);
+
+    const updates = newPosts.map((post, index) => ({
+      id: post.id,
+      display_order: index,
+    }));
+
+    reorderMutation.mutate(updates);
+    setDraggedPost(null);
+  };
+
+  // Selection handlers
+  const toggleSelection = (postId: string) => {
+    const newSelected = new Set(selectedPosts);
+    if (newSelected.has(postId)) {
+      newSelected.delete(postId);
+    } else {
+      newSelected.add(postId);
+    }
+    setSelectedPosts(newSelected);
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedPosts.size === paginatedPosts.length) {
+      setSelectedPosts(new Set());
+    } else {
+      setSelectedPosts(new Set(paginatedPosts.map(p => p.id)));
+    }
+  };
+
+  // Filtering and pagination
   const filteredPosts = platformFilter === 'all' 
     ? posts 
     : posts.filter(p => p.platform === platformFilter);
+
+  const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
+  
+  const paginatedPosts = useMemo(() => {
+    const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
+    return filteredPosts.slice(startIndex, startIndex + POSTS_PER_PAGE);
+  }, [filteredPosts, currentPage]);
+
+  // Reset page when filter changes
+  const handleFilterChange = (filter: 'all' | Platform) => {
+    setPlatformFilter(filter);
+    setCurrentPage(1);
+    setSelectedPosts(new Set());
+  };
+
+  // Metrics totals
+  const metrics = useMemo(() => {
+    return {
+      totalViews: posts.reduce((sum, p) => sum + (p.view_count || 0), 0),
+      totalClicks: posts.reduce((sum, p) => sum + (p.click_count || 0), 0),
+      published: posts.filter(p => p.status === 'published').length,
+      drafts: posts.filter(p => p.status === 'draft').length,
+    };
+  }, [posts]);
 
   const isPending = createMutation.isPending || updateMutation.isPending;
 
@@ -525,9 +669,57 @@ const AdminSocial = () => {
           </Dialog>
         </div>
 
+        {/* Metrics Cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="bg-card rounded-xl border border-border p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-500/10 rounded-lg">
+                <Eye className="w-5 h-5 text-blue-500" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{metrics.totalViews.toLocaleString()}</p>
+                <p className="text-sm text-muted-foreground">Total Views</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-card rounded-xl border border-border p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-500/10 rounded-lg">
+                <MousePointer className="w-5 h-5 text-green-500" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{metrics.totalClicks.toLocaleString()}</p>
+                <p className="text-sm text-muted-foreground">Total Clicks</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-card rounded-xl border border-border p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Star className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{metrics.published}</p>
+                <p className="text-sm text-muted-foreground">Published</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-card rounded-xl border border-border p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-muted rounded-lg">
+                <Pencil className="w-5 h-5 text-muted-foreground" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{metrics.drafts}</p>
+                <p className="text-sm text-muted-foreground">Drafts</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Filters and View Toggle */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <Tabs value={platformFilter} onValueChange={(v) => setPlatformFilter(v as typeof platformFilter)}>
+          <Tabs value={platformFilter} onValueChange={(v) => handleFilterChange(v as typeof platformFilter)}>
             <TabsList>
               <TabsTrigger value="all">All ({posts.length})</TabsTrigger>
               <TabsTrigger value="tiktok">TikTok</TabsTrigger>
@@ -557,6 +749,63 @@ const AdminSocial = () => {
           </div>
         </div>
 
+        {/* Bulk Actions Bar */}
+        {selectedPosts.size > 0 && (
+          <div className="flex items-center gap-4 p-4 bg-primary/10 rounded-xl border border-primary/20">
+            <span className="text-sm font-medium">{selectedPosts.size} selected</span>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => bulkStatusMutation.mutate({ ids: Array.from(selectedPosts), status: 'published' })}
+                disabled={bulkStatusMutation.isPending}
+              >
+                Publish
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => bulkStatusMutation.mutate({ ids: Array.from(selectedPosts), status: 'draft' })}
+                disabled={bulkStatusMutation.isPending}
+              >
+                Unpublish
+              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button size="sm" variant="destructive" disabled={bulkDeleteMutation.isPending}>
+                    Delete
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete {selectedPosts.size} posts?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. All selected posts will be permanently deleted.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => bulkDeleteMutation.mutate(Array.from(selectedPosts))}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      Delete All
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setSelectedPosts(new Set())}
+              className="ml-auto"
+            >
+              Clear selection
+            </Button>
+          </div>
+        )}
+
         {/* Content */}
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
@@ -572,17 +821,44 @@ const AdminSocial = () => {
             <Table>
               <TableHeader>
                 <TableRow className="bg-secondary/50">
+                  <TableHead className="w-10">
+                    <Checkbox
+                      checked={selectedPosts.size === paginatedPosts.length && paginatedPosts.length > 0}
+                      onCheckedChange={toggleSelectAll}
+                    />
+                  </TableHead>
+                  <TableHead className="w-10"></TableHead>
                   <TableHead className="w-16">Thumb</TableHead>
                   <TableHead>Title</TableHead>
                   <TableHead className="w-24">Platform</TableHead>
+                  <TableHead className="w-20 text-center">Views</TableHead>
+                  <TableHead className="w-20 text-center">Clicks</TableHead>
                   <TableHead className="w-24">Status</TableHead>
                   <TableHead className="w-20 text-center">Featured</TableHead>
                   <TableHead className="w-28 text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredPosts.map((post) => (
-                  <TableRow key={post.id} className="hover:bg-secondary/30">
+                {paginatedPosts.map((post) => (
+                  <TableRow 
+                    key={post.id} 
+                    className={`hover:bg-secondary/30 ${draggedPost?.id === post.id ? 'opacity-50' : ''}`}
+                    draggable
+                    onDragStart={() => handleDragStart(post)}
+                    onDragOver={handleDragOver}
+                    onDrop={() => handleDrop(post)}
+                  >
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedPosts.has(post.id)}
+                        onCheckedChange={() => toggleSelection(post.id)}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <div className="cursor-grab active:cursor-grabbing">
+                        <GripVertical className="w-4 h-4 text-muted-foreground" />
+                      </div>
+                    </TableCell>
                     <TableCell>
                       <div className="w-12 h-12 rounded-lg overflow-hidden bg-secondary flex items-center justify-center">
                         {post.thumbnail_url ? (
@@ -608,6 +884,12 @@ const AdminSocial = () => {
                       <Badge className={platformConfig[post.platform].bgColor}>
                         {platformConfig[post.platform].label}
                       </Badge>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <span className="text-sm text-muted-foreground">{(post.view_count || 0).toLocaleString()}</span>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <span className="text-sm text-muted-foreground">{(post.click_count || 0).toLocaleString()}</span>
                     </TableCell>
                     <TableCell>
                       <Badge variant={post.status === 'published' ? 'default' : 'secondary'}>
@@ -676,11 +958,26 @@ const AdminSocial = () => {
         ) : (
           /* Grid View */
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-            {filteredPosts.map((post) => (
+            {paginatedPosts.map((post) => (
               <div
                 key={post.id}
-                className="group relative bg-card rounded-xl border border-border overflow-hidden hover:border-primary/30 transition-all"
+                className={`group relative bg-card rounded-xl border overflow-hidden hover:border-primary/30 transition-all ${
+                  selectedPosts.has(post.id) ? 'border-primary ring-2 ring-primary/20' : 'border-border'
+                }`}
+                draggable
+                onDragStart={() => handleDragStart(post)}
+                onDragOver={handleDragOver}
+                onDrop={() => handleDrop(post)}
               >
+                {/* Selection checkbox */}
+                <div className="absolute top-1.5 left-1.5 z-10">
+                  <Checkbox
+                    checked={selectedPosts.has(post.id)}
+                    onCheckedChange={() => toggleSelection(post.id)}
+                    className="bg-background/80"
+                  />
+                </div>
+
                 {/* Thumbnail */}
                 <div className="aspect-[9/12] bg-secondary flex items-center justify-center relative">
                   {post.thumbnail_url ? (
@@ -705,7 +1002,7 @@ const AdminSocial = () => {
                   )}
                   
                   {/* Platform badge */}
-                  <div className={`absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded text-[10px] font-medium ${platformConfig[post.platform].bgColor}`}>
+                  <div className={`absolute top-1.5 right-10 px-1.5 py-0.5 rounded text-[10px] font-medium ${platformConfig[post.platform].bgColor}`}>
                     {platformConfig[post.platform].label}
                   </div>
 
@@ -728,6 +1025,13 @@ const AdminSocial = () => {
                   >
                     {post.status}
                   </Badge>
+
+                  {/* Metrics */}
+                  <div className="absolute bottom-1.5 right-1.5 flex gap-1">
+                    <span className="bg-background/80 text-[10px] px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                      <Eye className="w-3 h-3" /> {post.view_count || 0}
+                    </span>
+                  </div>
                 </div>
 
                 {/* Content */}
@@ -738,6 +1042,9 @@ const AdminSocial = () => {
                   
                   {/* Actions */}
                   <div className="flex items-center gap-1">
+                    <div className="cursor-grab active:cursor-grabbing p-1">
+                      <GripVertical className="w-3 h-3 text-muted-foreground" />
+                    </div>
                     <a
                       href={post.video_url}
                       target="_blank"
@@ -780,6 +1087,42 @@ const AdminSocial = () => {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              Showing {((currentPage - 1) * POSTS_PER_PAGE) + 1} to {Math.min(currentPage * POSTS_PER_PAGE, filteredPosts.length)} of {filteredPosts.length} posts
+            </p>
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <PaginationItem key={page}>
+                    <PaginationLink
+                      onClick={() => setCurrentPage(page)}
+                      isActive={currentPage === page}
+                      className="cursor-pointer"
+                    >
+                      {page}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
           </div>
         )}
       </div>
