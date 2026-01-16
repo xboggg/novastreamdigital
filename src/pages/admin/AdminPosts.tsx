@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Pencil, Trash2, Eye, EyeOff, Clock } from 'lucide-react';
+import { Plus, Pencil, Trash2, Eye, EyeOff, Clock, Upload, X } from 'lucide-react';
 import AdminLayout from './AdminLayout';
 import { Button } from '@/components/ui/button';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
@@ -34,6 +34,7 @@ const AdminPosts = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [editingPost, setEditingPost] = useState<Post | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -95,6 +96,50 @@ const AdminPosts = () => {
       status: post.status,
     });
     setIsDialogOpen(true);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast({ variant: 'destructive', title: 'Error', description: 'Please select an image file' });
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ variant: 'destructive', title: 'Error', description: 'Image must be less than 5MB' });
+      return;
+    }
+
+    setIsUploading(true);
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${crypto.randomUUID()}.${fileExt}`;
+      const filePath = `posts/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('post-images')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('post-images')
+        .getPublicUrl(filePath);
+
+      setFormData(prev => ({ ...prev, featured_image: publicUrl }));
+      toast({ title: 'Success', description: 'Image uploaded successfully' });
+    } catch (error: any) {
+      toast({ variant: 'destructive', title: 'Upload Error', description: error.message });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const removeImage = () => {
+    setFormData(prev => ({ ...prev, featured_image: '' }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -256,8 +301,50 @@ const AdminPosts = () => {
                   />
                 </div>
               </div>
+              {/* Image Upload Section */}
               <div>
-                <label className="block text-sm font-medium mb-2">Featured Image URL</label>
+                <label className="block text-sm font-medium mb-2">Featured Image</label>
+                {formData.featured_image ? (
+                  <div className="relative rounded-xl overflow-hidden border border-border">
+                    <img 
+                      src={formData.featured_image} 
+                      alt="Post preview" 
+                      className="w-full h-48 object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={removeImage}
+                      className="absolute top-2 right-2 p-1.5 rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <label className="flex flex-col items-center justify-center w-full h-48 rounded-xl border-2 border-dashed border-border bg-secondary/50 hover:bg-secondary cursor-pointer transition-colors">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      disabled={isUploading}
+                    />
+                    {isUploading ? (
+                      <div className="flex flex-col items-center">
+                        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mb-2" />
+                        <span className="text-sm text-muted-foreground">Uploading...</span>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center">
+                        <Upload className="w-10 h-10 text-muted-foreground mb-2" />
+                        <span className="text-sm text-muted-foreground">Click to upload image</span>
+                        <span className="text-xs text-muted-foreground mt-1">Max 5MB, JPG/PNG/WebP</span>
+                      </div>
+                    )}
+                  </label>
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Or enter Image URL</label>
                 <input
                   type="url"
                   value={formData.featured_image}

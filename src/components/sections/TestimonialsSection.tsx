@@ -1,55 +1,79 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Quote } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Quote, Star } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { Skeleton } from '@/components/ui/skeleton';
 
-const testimonials = [
-  {
-    id: 1,
-    quote: "NovaStream transformed our digital presence completely. The attention to detail and user experience is exceptional. Our conversion rates have increased by 40%.",
-    author: "Sarah Chen",
-    role: "CEO",
-    company: "Lumina Finance",
-  },
-  {
-    id: 2,
-    quote: "Working with NovaStream felt like having an extension of our own team. They understood our vision and delivered beyond expectations.",
-    author: "Marcus Rodriguez",
-    role: "Founder",
-    company: "Artisan Collective",
-  },
-  {
-    id: 3,
-    quote: "The web application they built for us has streamlined our entire operation. Clean, intuitive, and incredibly fast. Our patients love it.",
-    author: "Dr. Emily Watson",
-    role: "Director",
-    company: "Zenith Health",
-  },
-  {
-    id: 4,
-    quote: "Finally, a team that gets both design and development. The portfolio they created for us is a work of art that actually converts.",
-    author: "Alex Kim",
-    role: "Creative Director",
-    company: "Studio Forma",
-  },
-];
+interface Testimonial {
+  id: string;
+  client_name: string;
+  company: string | null;
+  role: string | null;
+  content: string;
+  rating: number | null;
+  avatar_url: string | null;
+}
 
 export const TestimonialsSection = () => {
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [current, setCurrent] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-
-  const next = useCallback(() => {
-    setCurrent((prev) => (prev + 1) % testimonials.length);
-  }, []);
-
-  const prev = useCallback(() => {
-    setCurrent((prev) => (prev - 1 + testimonials.length) % testimonials.length);
-  }, []);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (isPaused) return;
+    const fetchTestimonials = async () => {
+      const { data, error } = await supabase
+        .from('testimonials')
+        .select('*')
+        .eq('status', 'published')
+        .order('display_order', { ascending: true });
+
+      if (!error && data) {
+        setTestimonials(data);
+      }
+      setIsLoading(false);
+    };
+
+    fetchTestimonials();
+  }, []);
+
+  const next = useCallback(() => {
+    if (testimonials.length === 0) return;
+    setCurrent((prev) => (prev + 1) % testimonials.length);
+  }, [testimonials.length]);
+
+  const prev = useCallback(() => {
+    if (testimonials.length === 0) return;
+    setCurrent((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+  }, [testimonials.length]);
+
+  useEffect(() => {
+    if (isPaused || testimonials.length === 0) return;
     const timer = setInterval(next, 6000);
     return () => clearInterval(timer);
-  }, [isPaused, next]);
+  }, [isPaused, next, testimonials.length]);
+
+  if (isLoading) {
+    return (
+      <section className="section-padding bg-surface-overlay">
+        <div className="container-custom">
+          <div className="text-center mb-12">
+            <Skeleton className="h-4 w-24 mx-auto mb-4" />
+            <Skeleton className="h-10 w-64 mx-auto" />
+          </div>
+          <div className="max-w-4xl mx-auto">
+            <Skeleton className="h-64 w-full rounded-2xl" />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (testimonials.length === 0) {
+    return null; // Hide section if no testimonials
+  }
+
+  const currentTestimonial = testimonials[current];
 
   return (
     <section 
@@ -83,19 +107,48 @@ export const TestimonialsSection = () => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -50 }}
                 transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-                className="card-premium p-8 md:p-12 text-center"
+                className="card-premium p-8 md:p-12 text-center w-full"
               >
                 <Quote className="w-10 h-10 text-primary/30 mx-auto mb-6" />
+                
+                {/* Rating Stars */}
+                {currentTestimonial.rating && (
+                  <div className="flex justify-center gap-1 mb-4">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`w-5 h-5 ${
+                          i < currentTestimonial.rating!
+                            ? 'text-yellow-500 fill-yellow-500'
+                            : 'text-muted-foreground/30'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                )}
+                
                 <p className="text-lg md:text-xl lg:text-2xl text-foreground leading-relaxed mb-8">
-                  "{testimonials[current].quote}"
+                  "{currentTestimonial.content}"
                 </p>
-                <div>
-                  <p className="font-semibold text-foreground">
-                    {testimonials[current].author}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {testimonials[current].role}, {testimonials[current].company}
-                  </p>
+                
+                <div className="flex items-center justify-center gap-4">
+                  {currentTestimonial.avatar_url && (
+                    <img
+                      src={currentTestimonial.avatar_url}
+                      alt={currentTestimonial.client_name}
+                      className="w-12 h-12 rounded-full object-cover"
+                    />
+                  )}
+                  <div className="text-left">
+                    <p className="font-semibold text-foreground">
+                      {currentTestimonial.client_name}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {currentTestimonial.role}
+                      {currentTestimonial.role && currentTestimonial.company && ', '}
+                      {currentTestimonial.company}
+                    </p>
+                  </div>
                 </div>
               </motion.div>
             </AnimatePresence>
