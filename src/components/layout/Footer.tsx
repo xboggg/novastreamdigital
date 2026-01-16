@@ -1,5 +1,9 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { Check, Loader2 } from 'lucide-react';
 
 const footerLinks = {
   services: [
@@ -27,6 +31,58 @@ const socialLinks = [
 ];
 
 export const Footer = () => {
+  const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const { toast } = useToast();
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email || !email.includes('@')) {
+      toast({
+        title: "Invalid email",
+        description: "Please enter a valid email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const { error } = await supabase
+        .from('newsletter_subscribers')
+        .insert([{ email, source: 'footer' }]);
+
+      if (error) {
+        if (error.code === '23505') {
+          toast({
+            title: "Already subscribed",
+            description: "This email is already on our list!",
+          });
+        } else {
+          throw error;
+        }
+      } else {
+        setIsSubscribed(true);
+        setEmail('');
+        toast({
+          title: "Subscribed!",
+          description: "You'll receive our latest insights.",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <footer className="border-t border-border bg-surface-overlay">
       <div className="container-custom section-padding">
@@ -102,21 +158,36 @@ export const Footer = () => {
             <p className="text-sm text-muted-foreground mb-4">
               Get insights on design, technology, and digital experiences.
             </p>
-            <form className="flex gap-2" onSubmit={(e) => e.preventDefault()}>
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 h-10 px-4 rounded-lg bg-secondary border border-border text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
-              />
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                type="submit"
-                className="h-10 px-4 rounded-lg gradient-bg text-primary-foreground text-sm font-medium hover:shadow-glow transition-shadow"
-              >
-                Subscribe
-              </motion.button>
-            </form>
+            {isSubscribed ? (
+              <div className="flex items-center gap-2 text-sm text-primary">
+                <Check className="w-4 h-4" />
+                <span>Thanks for subscribing!</span>
+              </div>
+            ) : (
+              <form className="flex gap-2" onSubmit={handleNewsletterSubmit}>
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={isSubmitting}
+                  className="flex-1 h-10 px-4 rounded-lg bg-secondary border border-border text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all disabled:opacity-50"
+                />
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="h-10 px-4 rounded-lg gradient-bg text-primary-foreground text-sm font-medium hover:shadow-glow transition-shadow disabled:opacity-50"
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    'Subscribe'
+                  )}
+                </motion.button>
+              </form>
+            )}
           </div>
         </div>
 
