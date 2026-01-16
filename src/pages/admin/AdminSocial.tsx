@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import AdminLayout from './AdminLayout';
@@ -33,11 +33,25 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Pencil, Trash2, Star, ExternalLink, Loader2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Star, ExternalLink, Loader2, HelpCircle, Upload, Grid, List, Image } from 'lucide-react';
 
 type Platform = 'tiktok' | 'youtube' | 'instagram' | 'facebook';
 type ContentStatus = 'draft' | 'published';
+type ViewMode = 'grid' | 'table';
 
 interface SocialPost {
   id: string;
@@ -60,34 +74,48 @@ const platformConfig: Record<Platform, { label: string; color: string; bgColor: 
 };
 
 // URL parsing functions
-const parseVideoUrl = (url: string): { platform: Platform | null; embedId: string | null } => {
+const parseVideoUrl = (url: string): { platform: Platform | null; embedId: string | null; thumbnailUrl: string | null } => {
   try {
     // YouTube Shorts
     const youtubeShortMatch = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]+)/);
-    if (youtubeShortMatch) return { platform: 'youtube', embedId: youtubeShortMatch[1] };
+    if (youtubeShortMatch) {
+      const embedId = youtubeShortMatch[1];
+      return { 
+        platform: 'youtube', 
+        embedId, 
+        thumbnailUrl: `https://img.youtube.com/vi/${embedId}/maxresdefault.jpg` 
+      };
+    }
     
     // YouTube regular/embed
     const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]+)/);
-    if (youtubeMatch) return { platform: 'youtube', embedId: youtubeMatch[1] };
+    if (youtubeMatch) {
+      const embedId = youtubeMatch[1];
+      return { 
+        platform: 'youtube', 
+        embedId, 
+        thumbnailUrl: `https://img.youtube.com/vi/${embedId}/maxresdefault.jpg` 
+      };
+    }
     
     // TikTok
     const tiktokMatch = url.match(/tiktok\.com\/@[^/]+\/video\/(\d+)/);
-    if (tiktokMatch) return { platform: 'tiktok', embedId: tiktokMatch[1] };
+    if (tiktokMatch) return { platform: 'tiktok', embedId: tiktokMatch[1], thumbnailUrl: null };
     
     // Instagram Reels/Posts
     const instagramMatch = url.match(/instagram\.com\/(?:reel|p)\/([a-zA-Z0-9_-]+)/);
-    if (instagramMatch) return { platform: 'instagram', embedId: instagramMatch[1] };
+    if (instagramMatch) return { platform: 'instagram', embedId: instagramMatch[1], thumbnailUrl: null };
     
     // Facebook Reels/Videos
     const facebookReelMatch = url.match(/facebook\.com\/reel\/(\d+)/);
-    if (facebookReelMatch) return { platform: 'facebook', embedId: facebookReelMatch[1] };
+    if (facebookReelMatch) return { platform: 'facebook', embedId: facebookReelMatch[1], thumbnailUrl: null };
     
     const facebookVideoMatch = url.match(/facebook\.com\/watch\/?\?v=(\d+)/);
-    if (facebookVideoMatch) return { platform: 'facebook', embedId: facebookVideoMatch[1] };
+    if (facebookVideoMatch) return { platform: 'facebook', embedId: facebookVideoMatch[1], thumbnailUrl: null };
     
-    return { platform: null, embedId: null };
+    return { platform: null, embedId: null, thumbnailUrl: null };
   } catch {
-    return { platform: null, embedId: null };
+    return { platform: null, embedId: null, thumbnailUrl: null };
   }
 };
 
@@ -95,6 +123,9 @@ const AdminSocial = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<SocialPost | null>(null);
   const [platformFilter, setPlatformFilter] = useState<'all' | Platform>('all');
+  const [viewMode, setViewMode] = useState<ViewMode>('table');
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     platform: '' as Platform | '',
     video_url: '',
@@ -201,14 +232,61 @@ const AdminSocial = () => {
 
   const handleUrlChange = (url: string) => {
     setFormData(prev => ({ ...prev, video_url: url }));
-    const { platform, embedId } = parseVideoUrl(url);
+    const { platform, embedId, thumbnailUrl } = parseVideoUrl(url);
     if (platform && embedId) {
       setFormData(prev => ({ 
         ...prev, 
         video_url: url,
         platform, 
-        embed_id: embedId 
+        embed_id: embedId,
+        // Auto-fill thumbnail for YouTube
+        thumbnail_url: thumbnailUrl && !prev.thumbnail_url ? thumbnailUrl : prev.thumbnail_url,
       }));
+    }
+  };
+
+  const handleThumbnailUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({ title: 'Error', description: 'Please select an image file.', variant: 'destructive' });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: 'Error', description: 'Image must be less than 5MB.', variant: 'destructive' });
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `thumbnails/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('social-thumbnails')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('social-thumbnails')
+        .getPublicUrl(filePath);
+
+      setFormData(prev => ({ ...prev, thumbnail_url: publicUrl }));
+      toast({ title: 'Success', description: 'Thumbnail uploaded successfully.' });
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast({ title: 'Error', description: 'Failed to upload thumbnail.', variant: 'destructive' });
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -248,7 +326,7 @@ const AdminSocial = () => {
 
   return (
     <AdminLayout>
-      <div className="space-y-8">
+      <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
@@ -270,13 +348,23 @@ const AdminSocial = () => {
                 Add Video
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-lg">
+            <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>{editingPost ? 'Edit Video' : 'Add Video'}</DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="video_url">Video URL</Label>
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="video_url">Video URL</Label>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <HelpCircle className="w-4 h-4 text-muted-foreground cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-xs">
+                        <p>The full URL of the video (e.g., https://youtube.com/shorts/abc123). We'll automatically detect the platform and extract the embed ID.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
                   <Input
                     id="video_url"
                     placeholder="Paste TikTok, YouTube, Instagram, or Facebook URL..."
@@ -291,33 +379,45 @@ const AdminSocial = () => {
                   )}
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="platform">Platform</Label>
-                  <Select 
-                    value={formData.platform} 
-                    onValueChange={(value: Platform) => setFormData(prev => ({ ...prev, platform: value }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select platform" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="tiktok">TikTok</SelectItem>
-                      <SelectItem value="youtube">YouTube</SelectItem>
-                      <SelectItem value="instagram">Instagram</SelectItem>
-                      <SelectItem value="facebook">Facebook</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="platform">Platform</Label>
+                    <Select 
+                      value={formData.platform} 
+                      onValueChange={(value: Platform) => setFormData(prev => ({ ...prev, platform: value }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select platform" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="tiktok">TikTok</SelectItem>
+                        <SelectItem value="youtube">YouTube</SelectItem>
+                        <SelectItem value="instagram">Instagram</SelectItem>
+                        <SelectItem value="facebook">Facebook</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="embed_id">Embed ID</Label>
-                  <Input
-                    id="embed_id"
-                    placeholder="Video/Post ID"
-                    value={formData.embed_id}
-                    onChange={(e) => setFormData(prev => ({ ...prev, embed_id: e.target.value }))}
-                    required
-                  />
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="embed_id">Embed ID</Label>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <HelpCircle className="w-4 h-4 text-muted-foreground cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs">
+                          <p>The unique video identifier extracted from the URL. For YouTube "abc123" from youtube.com/shorts/abc123. This is used to embed the video on your site.</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                    <Input
+                      id="embed_id"
+                      placeholder="Video/Post ID"
+                      value={formData.embed_id}
+                      onChange={(e) => setFormData(prev => ({ ...prev, embed_id: e.target.value }))}
+                      required
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">
@@ -332,13 +432,50 @@ const AdminSocial = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="thumbnail_url">Thumbnail URL (optional)</Label>
-                  <Input
-                    id="thumbnail_url"
-                    placeholder="https://..."
-                    value={formData.thumbnail_url}
-                    onChange={(e) => setFormData(prev => ({ ...prev, thumbnail_url: e.target.value }))}
-                  />
+                  <Label>Thumbnail</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="https://... or upload below"
+                      value={formData.thumbnail_url}
+                      onChange={(e) => setFormData(prev => ({ ...prev, thumbnail_url: e.target.value }))}
+                      className="flex-1"
+                    />
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      accept="image/*"
+                      onChange={handleThumbnailUpload}
+                      className="hidden"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isUploading}
+                    >
+                      {isUploading ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Upload className="w-4 h-4" />
+                      )}
+                    </Button>
+                  </div>
+                  {formData.thumbnail_url && (
+                    <div className="mt-2 relative w-24 h-24 rounded-lg overflow-hidden border border-border">
+                      <img 
+                        src={formData.thumbnail_url} 
+                        alt="Thumbnail preview" 
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '';
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    YouTube thumbnails are auto-fetched. For other platforms, paste URL or upload an image.
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -388,18 +525,39 @@ const AdminSocial = () => {
           </Dialog>
         </div>
 
-        {/* Platform filter tabs */}
-        <Tabs value={platformFilter} onValueChange={(v) => setPlatformFilter(v as typeof platformFilter)}>
-          <TabsList>
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="tiktok">TikTok</TabsTrigger>
-            <TabsTrigger value="youtube">YouTube</TabsTrigger>
-            <TabsTrigger value="instagram">Instagram</TabsTrigger>
-            <TabsTrigger value="facebook">Facebook</TabsTrigger>
-          </TabsList>
-        </Tabs>
+        {/* Filters and View Toggle */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <Tabs value={platformFilter} onValueChange={(v) => setPlatformFilter(v as typeof platformFilter)}>
+            <TabsList>
+              <TabsTrigger value="all">All ({posts.length})</TabsTrigger>
+              <TabsTrigger value="tiktok">TikTok</TabsTrigger>
+              <TabsTrigger value="youtube">YouTube</TabsTrigger>
+              <TabsTrigger value="instagram">Instagram</TabsTrigger>
+              <TabsTrigger value="facebook">Facebook</TabsTrigger>
+            </TabsList>
+          </Tabs>
 
-        {/* Posts grid */}
+          <div className="flex gap-1 bg-secondary rounded-lg p-1">
+            <Button
+              variant={viewMode === 'table' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('table')}
+              className="h-8 px-3"
+            >
+              <List className="w-4 h-4" />
+            </Button>
+            <Button
+              variant={viewMode === 'grid' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('grid')}
+              className="h-8 px-3"
+            >
+              <Grid className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Content */}
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
@@ -408,85 +566,196 @@ const AdminSocial = () => {
           <div className="text-center py-12 bg-card rounded-xl border border-border">
             <p className="text-muted-foreground">No social posts yet. Add your first video!</p>
           </div>
+        ) : viewMode === 'table' ? (
+          /* Table View */
+          <div className="rounded-xl border border-border overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-secondary/50">
+                  <TableHead className="w-16">Thumb</TableHead>
+                  <TableHead>Title</TableHead>
+                  <TableHead className="w-24">Platform</TableHead>
+                  <TableHead className="w-24">Status</TableHead>
+                  <TableHead className="w-20 text-center">Featured</TableHead>
+                  <TableHead className="w-28 text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredPosts.map((post) => (
+                  <TableRow key={post.id} className="hover:bg-secondary/30">
+                    <TableCell>
+                      <div className="w-12 h-12 rounded-lg overflow-hidden bg-secondary flex items-center justify-center">
+                        {post.thumbnail_url ? (
+                          <img 
+                            src={post.thumbnail_url} 
+                            alt="" 
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                              (e.target as HTMLImageElement).parentElement!.innerHTML = '<span class="text-muted-foreground"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></span>';
+                            }}
+                          />
+                        ) : (
+                          <Image className="w-5 h-5 text-muted-foreground" />
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <p className="font-medium line-clamp-1">{post.title || 'Untitled video'}</p>
+                      <p className="text-xs text-muted-foreground line-clamp-1">{post.embed_id}</p>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={platformConfig[post.platform].bgColor}>
+                        {platformConfig[post.platform].label}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={post.status === 'published' ? 'default' : 'secondary'}>
+                        {post.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <button
+                        onClick={() => toggleFeatured.mutate({ id: post.id, is_featured: !post.is_featured })}
+                        className={`p-1.5 rounded-full transition-colors ${
+                          post.is_featured 
+                            ? 'bg-yellow-500 text-yellow-900' 
+                            : 'bg-secondary text-muted-foreground hover:text-yellow-500'
+                        }`}
+                      >
+                        <Star className="w-4 h-4" fill={post.is_featured ? 'currentColor' : 'none'} />
+                      </button>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center justify-end gap-1">
+                        <a
+                          href={post.video_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-1.5 rounded-lg hover:bg-secondary transition-colors"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                        </a>
+                        <button
+                          onClick={() => handleEdit(post)}
+                          className="p-1.5 rounded-lg hover:bg-secondary transition-colors"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <button className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors">
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete this video?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This action cannot be undone. The video will be removed from your social feed.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => deleteMutation.mutate(post.id)}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          /* Grid View */
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
             {filteredPosts.map((post) => (
               <div
                 key={post.id}
                 className="group relative bg-card rounded-xl border border-border overflow-hidden hover:border-primary/30 transition-all"
               >
                 {/* Thumbnail */}
-                <div className="aspect-[9/16] bg-secondary flex items-center justify-center relative">
+                <div className="aspect-[9/12] bg-secondary flex items-center justify-center relative">
                   {post.thumbnail_url ? (
                     <img 
                       src={post.thumbnail_url} 
                       alt={post.title || 'Video thumbnail'} 
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
                     />
                   ) : (
                     <div className="text-center p-4">
-                      <div className={`text-4xl mb-2 ${platformConfig[post.platform].color}`}>
+                      <div className={`text-3xl mb-1 ${platformConfig[post.platform].color}`}>
                         {post.platform === 'youtube' && '▶'}
                         {post.platform === 'tiktok' && '♪'}
                         {post.platform === 'instagram' && '📷'}
                         {post.platform === 'facebook' && 'f'}
                       </div>
-                      <p className="text-xs text-muted-foreground">No thumbnail</p>
+                      <p className="text-[10px] text-muted-foreground">No thumbnail</p>
                     </div>
                   )}
                   
                   {/* Platform badge */}
-                  <div className={`absolute top-2 left-2 px-2 py-1 rounded-md text-xs font-medium ${platformConfig[post.platform].bgColor}`}>
+                  <div className={`absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded text-[10px] font-medium ${platformConfig[post.platform].bgColor}`}>
                     {platformConfig[post.platform].label}
                   </div>
 
                   {/* Featured star */}
                   <button
                     onClick={() => toggleFeatured.mutate({ id: post.id, is_featured: !post.is_featured })}
-                    className={`absolute top-2 right-2 p-1.5 rounded-full transition-colors ${
+                    className={`absolute top-1.5 right-1.5 p-1 rounded-full transition-colors ${
                       post.is_featured 
                         ? 'bg-yellow-500 text-yellow-900' 
                         : 'bg-background/80 text-muted-foreground hover:text-yellow-500'
                     }`}
                   >
-                    <Star className="w-4 h-4" fill={post.is_featured ? 'currentColor' : 'none'} />
+                    <Star className="w-3 h-3" fill={post.is_featured ? 'currentColor' : 'none'} />
                   </button>
 
                   {/* Status badge */}
                   <Badge
                     variant={post.status === 'published' ? 'default' : 'secondary'}
-                    className="absolute bottom-2 left-2"
+                    className="absolute bottom-1.5 left-1.5 text-[10px] px-1.5 py-0"
                   >
                     {post.status}
                   </Badge>
                 </div>
 
                 {/* Content */}
-                <div className="p-3">
-                  <p className="text-sm font-medium line-clamp-2 mb-2">
+                <div className="p-2">
+                  <p className="text-xs font-medium line-clamp-1 mb-1">
                     {post.title || 'Untitled video'}
                   </p>
                   
                   {/* Actions */}
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
                     <a
                       href={post.video_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-1.5 rounded-lg hover:bg-secondary transition-colors"
+                      className="p-1 rounded hover:bg-secondary transition-colors"
                     >
-                      <ExternalLink className="w-4 h-4" />
+                      <ExternalLink className="w-3 h-3" />
                     </a>
                     <button
                       onClick={() => handleEdit(post)}
-                      className="p-1.5 rounded-lg hover:bg-secondary transition-colors"
+                      className="p-1 rounded hover:bg-secondary transition-colors"
                     >
-                      <Pencil className="w-4 h-4" />
+                      <Pencil className="w-3 h-3" />
                     </button>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <button className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors">
-                          <Trash2 className="w-4 h-4" />
+                        <button className="p-1 rounded hover:bg-destructive/10 text-destructive transition-colors">
+                          <Trash2 className="w-3 h-3" />
                         </button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
