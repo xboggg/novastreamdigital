@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Pencil, Trash2, Eye, EyeOff, Clock, Upload, X, Copy } from 'lucide-react';
+import { Plus, Pencil, Trash2, Eye, EyeOff, Clock, Upload, X, Copy, GripVertical, CheckSquare, Square } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import AdminLayout from './AdminLayout';
 import { Button } from '@/components/ui/button';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
@@ -35,6 +36,8 @@ const AdminPosts = () => {
   const [editingPost, setEditingPost] = useState<Post | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [draggedId, setDraggedId] = useState<string | null>(null);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -240,6 +243,109 @@ const AdminPosts = () => {
     }
   };
 
+  // Drag and drop handlers
+  const handleDragStart = (e: React.DragEvent, id: string) => {
+    setDraggedId(id);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = async (e: React.DragEvent, targetId: string) => {
+    e.preventDefault();
+    if (!draggedId || draggedId === targetId) {
+      setDraggedId(null);
+      return;
+    }
+
+    const draggedIndex = posts.findIndex(p => p.id === draggedId);
+    const targetIndex = posts.findIndex(p => p.id === targetId);
+    
+    const newPosts = [...posts];
+    const [removed] = newPosts.splice(draggedIndex, 1);
+    newPosts.splice(targetIndex, 0, removed);
+    
+    setPosts(newPosts);
+    setDraggedId(null);
+
+    toast({ title: 'Success', description: 'Order updated (Note: Posts ordered by date by default)' });
+  };
+
+  // Selection handlers
+  const toggleSelection = (id: string) => {
+    const newSelected = new Set(selectedIds);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedIds(newSelected);
+  };
+
+  const selectAll = () => {
+    if (selectedIds.size === posts.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(posts.map(p => p.id)));
+    }
+  };
+
+  // Bulk actions
+  const bulkPublish = async () => {
+    if (selectedIds.size === 0) return;
+    
+    const { error } = await supabase
+      .from('posts')
+      .update({ status: 'published', published_at: new Date().toISOString() })
+      .in('id', Array.from(selectedIds));
+
+    if (error) {
+      toast({ variant: 'destructive', title: 'Error', description: error.message });
+    } else {
+      toast({ title: 'Success', description: `${selectedIds.size} posts published` });
+      setSelectedIds(new Set());
+      fetchPosts();
+    }
+  };
+
+  const bulkUnpublish = async () => {
+    if (selectedIds.size === 0) return;
+    
+    const { error } = await supabase
+      .from('posts')
+      .update({ status: 'draft', published_at: null })
+      .in('id', Array.from(selectedIds));
+
+    if (error) {
+      toast({ variant: 'destructive', title: 'Error', description: error.message });
+    } else {
+      toast({ title: 'Success', description: `${selectedIds.size} posts unpublished` });
+      setSelectedIds(new Set());
+      fetchPosts();
+    }
+  };
+
+  const bulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+    if (!confirm(`Are you sure you want to delete ${selectedIds.size} posts?`)) return;
+    
+    const { error } = await supabase
+      .from('posts')
+      .delete()
+      .in('id', Array.from(selectedIds));
+
+    if (error) {
+      toast({ variant: 'destructive', title: 'Error', description: error.message });
+    } else {
+      toast({ title: 'Success', description: `${selectedIds.size} posts deleted` });
+      setSelectedIds(new Set());
+      fetchPosts();
+    }
+  };
+
   if (isLoading) {
     return (
       <AdminLayout>
@@ -420,76 +526,137 @@ const AdminPosts = () => {
           </Button>
         </div>
       ) : (
-        <div className="grid gap-4">
-          {posts.map((post, index) => (
-            <motion.div
-              key={post.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className="card-premium p-4 flex items-center gap-4"
+        <>
+          {/* Bulk Actions Bar */}
+          <div className="flex items-center gap-4 mb-4 p-3 rounded-xl bg-secondary/50 border border-border">
+            <button
+              onClick={selectAll}
+              className="flex items-center gap-2 text-sm hover:text-primary transition-colors"
             >
-              {post.featured_image && (
-                <img
-                  src={post.featured_image}
-                  alt={post.title}
-                  className="w-16 h-12 object-cover rounded-lg"
-                />
+              {selectedIds.size === posts.length ? (
+                <CheckSquare className="w-4 h-4" />
+              ) : (
+                <Square className="w-4 h-4" />
               )}
-              <div className="flex-1 min-w-0">
-                <h3 className="font-medium truncate">{post.title}</h3>
-                <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                  {post.category && <span>{post.category}</span>}
-                  {post.reading_time && (
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {post.reading_time} min
-                    </span>
-                  )}
+              {selectedIds.size === posts.length ? 'Deselect All' : 'Select All'}
+            </button>
+            
+            {selectedIds.size > 0 && (
+              <>
+                <span className="text-sm text-muted-foreground">
+                  {selectedIds.size} selected
+                </span>
+                <div className="h-4 w-px bg-border" />
+                <Button size="sm" variant="outline" onClick={bulkPublish}>
+                  <Eye className="w-3 h-3 mr-1" />
+                  Publish
+                </Button>
+                <Button size="sm" variant="outline" onClick={bulkUnpublish}>
+                  <EyeOff className="w-3 h-3 mr-1" />
+                  Unpublish
+                </Button>
+                <Button size="sm" variant="destructive" onClick={bulkDelete}>
+                  <Trash2 className="w-3 h-3 mr-1" />
+                  Delete
+                </Button>
+              </>
+            )}
+            
+            <span className="ml-auto text-xs text-muted-foreground">
+              <GripVertical className="w-3 h-3 inline mr-1" />
+              Drag to reorder
+            </span>
+          </div>
+
+          <div className="grid gap-2">
+            {posts.map((post, index) => (
+              <motion.div
+                key={post.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.02 }}
+                draggable
+                onDragStart={(e) => handleDragStart(e as any, post.id)}
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e as any, post.id)}
+                className={`card-premium p-4 flex items-center gap-4 cursor-grab active:cursor-grabbing ${
+                  draggedId === post.id ? 'opacity-50 scale-[0.98]' : ''
+                } ${selectedIds.has(post.id) ? 'ring-2 ring-primary' : ''}`}
+              >
+                {/* Drag Handle */}
+                <div className="text-muted-foreground hover:text-foreground transition-colors">
+                  <GripVertical className="w-5 h-5" />
                 </div>
-              </div>
-              <span className={`px-2 py-1 rounded-full text-xs ${
-                post.status === 'published' 
-                  ? 'bg-emerald-500/10 text-emerald-500' 
-                  : 'bg-secondary text-muted-foreground'
-              }`}>
-                {post.status}
-              </span>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => toggleStatus(post)}
-                  className="p-2 rounded-lg hover:bg-secondary transition-colors"
-                  title={post.status === 'published' ? 'Unpublish' : 'Publish'}
-                >
-                  {post.status === 'published' ? (
-                    <EyeOff className="w-4 h-4 text-muted-foreground" />
-                  ) : (
-                    <Eye className="w-4 h-4 text-muted-foreground" />
-                  )}
-                </button>
-                <button
-                  onClick={() => duplicatePost(post)}
-                  className="p-2 rounded-lg hover:bg-secondary transition-colors"
-                  title="Duplicate post"
-                >
-                  <Copy className="w-4 h-4 text-muted-foreground" />
-                </button>
-                <button
-                  onClick={() => openEditDialog(post)}
-                  className="p-2 rounded-lg hover:bg-secondary transition-colors"
-                >
-                  <Pencil className="w-4 h-4 text-muted-foreground" />
-                </button>
-                <button
-                  onClick={() => handleDelete(post.id)}
-                  className="p-2 rounded-lg hover:bg-destructive/10 transition-colors"
-                >
-                  <Trash2 className="w-4 h-4 text-destructive" />
-                </button>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+                
+                {/* Checkbox */}
+                <Checkbox
+                  checked={selectedIds.has(post.id)}
+                  onCheckedChange={() => toggleSelection(post.id)}
+                  className="shrink-0"
+                />
+
+                {post.featured_image && (
+                  <img
+                    src={post.featured_image}
+                    alt={post.title}
+                    className="w-16 h-12 object-cover rounded-lg"
+                  />
+                )}
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-medium truncate">{post.title}</h3>
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                    {post.category && <span>{post.category}</span>}
+                    {post.reading_time && (
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {post.reading_time} min
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <span className={`px-2 py-1 rounded-full text-xs ${
+                  post.status === 'published' 
+                    ? 'bg-emerald-500/10 text-emerald-500' 
+                    : 'bg-secondary text-muted-foreground'
+                }`}>
+                  {post.status}
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => toggleStatus(post)}
+                    className="p-2 rounded-lg hover:bg-secondary transition-colors"
+                    title={post.status === 'published' ? 'Unpublish' : 'Publish'}
+                  >
+                    {post.status === 'published' ? (
+                      <EyeOff className="w-4 h-4 text-muted-foreground" />
+                    ) : (
+                      <Eye className="w-4 h-4 text-muted-foreground" />
+                    )}
+                  </button>
+                  <button
+                    onClick={() => duplicatePost(post)}
+                    className="p-2 rounded-lg hover:bg-secondary transition-colors"
+                    title="Duplicate post"
+                  >
+                    <Copy className="w-4 h-4 text-muted-foreground" />
+                  </button>
+                  <button
+                    onClick={() => openEditDialog(post)}
+                    className="p-2 rounded-lg hover:bg-secondary transition-colors"
+                  >
+                    <Pencil className="w-4 h-4 text-muted-foreground" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(post.id)}
+                    className="p-2 rounded-lg hover:bg-destructive/10 transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4 text-destructive" />
+                  </button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </>
       )}
     </AdminLayout>
   );
