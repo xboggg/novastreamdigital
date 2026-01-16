@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Plus, Pencil, Trash2, Eye, EyeOff, Clock } from 'lucide-react';
 import AdminLayout from './AdminLayout';
 import { Button } from '@/components/ui/button';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -230,11 +231,9 @@ const AdminPosts = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2">Content</label>
-                <textarea
-                  value={formData.content}
-                  onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-                  rows={8}
-                  className="w-full px-4 py-3 rounded-xl bg-secondary border border-border resize-none"
+                <RichTextEditor
+                  content={formData.content}
+                  onChange={(content) => setFormData(prev => ({ ...prev, content }))}
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">

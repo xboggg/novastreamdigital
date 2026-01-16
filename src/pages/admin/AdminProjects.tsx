@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Plus, Pencil, Trash2, Eye, EyeOff, Star, StarOff, Upload, X } from 'lucide-react';
 import AdminLayout from './AdminLayout';
 import { Button } from '@/components/ui/button';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -18,6 +19,7 @@ interface Project {
   title: string;
   slug: string | null;
   description: string | null;
+  content: string | null;
   category: string | null;
   image_url: string | null;
   tags: string[] | null;
@@ -38,6 +40,7 @@ const AdminProjects = () => {
     title: '',
     slug: '',
     description: '',
+    content: '',
     category: '',
     image_url: '',
     tags: '',
@@ -68,6 +71,7 @@ const AdminProjects = () => {
       title: '',
       slug: '',
       description: '',
+      content: '',
       category: '',
       image_url: '',
       tags: '',
@@ -83,6 +87,7 @@ const AdminProjects = () => {
       title: project.title,
       slug: project.slug || '',
       description: project.description || '',
+      content: project.content || '',
       category: project.category || '',
       image_url: project.image_url || '',
       tags: project.tags?.join(', ') || '',
@@ -145,6 +150,7 @@ const AdminProjects = () => {
       title: formData.title,
       slug: formData.slug || formData.title.toLowerCase().replace(/\s+/g, '-'),
       description: formData.description,
+      content: formData.content,
       category: formData.category,
       image_url: formData.image_url,
       tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
@@ -276,6 +282,13 @@ const AdminProjects = () => {
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                   rows={3}
                   className="w-full px-4 py-3 rounded-xl bg-secondary border border-border resize-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Case Study Content</label>
+                <RichTextEditor
+                  content={formData.content}
+                  onChange={(content) => setFormData(prev => ({ ...prev, content }))}
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
