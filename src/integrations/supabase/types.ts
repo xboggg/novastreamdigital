@@ -367,6 +367,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      increment_social_post_click: {
+        Args: { post_id: string }
+        Returns: undefined
+      }
+      increment_social_post_view: {
+        Args: { post_id: string }
+        Returns: undefined
+      }
       is_admin: { Args: never; Returns: boolean }
     }
     Enums: {
