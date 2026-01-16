@@ -7,6 +7,7 @@ import {
   FileText,
   MessageSquare,
   Users,
+  Mail,
   Settings,
   LogOut,
   Menu,
@@ -26,6 +27,7 @@ const navItems = [
   { icon: FileText, label: 'Blog Posts', path: '/admin/posts' },
   { icon: MessageSquare, label: 'Testimonials', path: '/admin/testimonials' },
   { icon: Users, label: 'Leads', path: '/admin/leads' },
+  { icon: Mail, label: 'Newsletter', path: '/admin/newsletter' },
   { icon: Settings, label: 'Settings', path: '/admin/settings' },
 ];
 
