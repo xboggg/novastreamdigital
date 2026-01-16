@@ -274,6 +274,7 @@ export type Database = {
       }
       social_posts: {
         Row: {
+          click_count: number | null
           created_at: string
           display_order: number | null
           embed_id: string
@@ -285,8 +286,10 @@ export type Database = {
           title: string | null
           updated_at: string
           video_url: string
+          view_count: number | null
         }
         Insert: {
+          click_count?: number | null
           created_at?: string
           display_order?: number | null
           embed_id: string
@@ -298,8 +301,10 @@ export type Database = {
           title?: string | null
           updated_at?: string
           video_url: string
+          view_count?: number | null
         }
         Update: {
+          click_count?: number | null
           created_at?: string
           display_order?: number | null
           embed_id?: string
@@ -311,6 +316,7 @@ export type Database = {
           title?: string | null
           updated_at?: string
           video_url?: string
+          view_count?: number | null
         }
         Relationships: []
       }
