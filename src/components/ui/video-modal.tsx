@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
+import { useEffect } from 'react';
 
 type Platform = 'tiktok' | 'youtube' | 'instagram' | 'facebook';
 
@@ -9,6 +10,7 @@ interface VideoModalProps {
   platform: Platform;
   embedId: string;
   title?: string;
+  onView?: () => void;
 }
 
 const getEmbedUrl = (platform: Platform, embedId: string): string => {
@@ -26,8 +28,15 @@ const getEmbedUrl = (platform: Platform, embedId: string): string => {
   }
 };
 
-export const VideoModal = ({ isOpen, onClose, platform, embedId, title }: VideoModalProps) => {
+export const VideoModal = ({ isOpen, onClose, platform, embedId, title, onView }: VideoModalProps) => {
   const embedUrl = getEmbedUrl(platform, embedId);
+
+  // Track view when modal opens
+  useEffect(() => {
+    if (isOpen && onView) {
+      onView();
+    }
+  }, [isOpen, onView]);
 
   return (
     <AnimatePresence>

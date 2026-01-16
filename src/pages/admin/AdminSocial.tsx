@@ -58,8 +58,9 @@ import {
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Plus, Pencil, Trash2, Star, ExternalLink, Loader2, HelpCircle, Upload, 
-  Grid, List, Image, GripVertical, Eye, MousePointer, ChevronDown 
+  Grid, List, Image, GripVertical, Eye, MousePointer, ChevronDown, Search, BarChart3
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 type Platform = 'tiktok' | 'youtube' | 'instagram' | 'facebook';
 type ContentStatus = 'draft' | 'published';
@@ -144,6 +145,7 @@ const AdminSocial = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedPosts, setSelectedPosts] = useState<Set<string>>(new Set());
   const [draggedPost, setDraggedPost] = useState<SocialPost | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     platform: '' as Platform | '',
@@ -438,9 +440,23 @@ const AdminSocial = () => {
   };
 
   // Filtering and pagination
-  const filteredPosts = platformFilter === 'all' 
-    ? posts 
-    : posts.filter(p => p.platform === platformFilter);
+  const filteredPosts = useMemo(() => {
+    let result = platformFilter === 'all' 
+      ? posts 
+      : posts.filter(p => p.platform === platformFilter);
+    
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(p => 
+        (p.title?.toLowerCase().includes(query)) ||
+        p.embed_id.toLowerCase().includes(query) ||
+        p.video_url.toLowerCase().includes(query)
+      );
+    }
+    
+    return result;
+  }, [posts, platformFilter, searchQuery]);
 
   const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
   
@@ -449,9 +465,15 @@ const AdminSocial = () => {
     return filteredPosts.slice(startIndex, startIndex + POSTS_PER_PAGE);
   }, [filteredPosts, currentPage]);
 
-  // Reset page when filter changes
+  // Reset page when filter or search changes
   const handleFilterChange = (filter: 'all' | Platform) => {
     setPlatformFilter(filter);
+    setCurrentPage(1);
+    setSelectedPosts(new Set());
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
     setCurrentPage(1);
     setSelectedPosts(new Set());
   };
@@ -717,35 +739,58 @@ const AdminSocial = () => {
           </div>
         </div>
 
-        {/* Filters and View Toggle */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <Tabs value={platformFilter} onValueChange={(v) => handleFilterChange(v as typeof platformFilter)}>
-            <TabsList>
-              <TabsTrigger value="all">All ({posts.length})</TabsTrigger>
-              <TabsTrigger value="tiktok">TikTok</TabsTrigger>
-              <TabsTrigger value="youtube">YouTube</TabsTrigger>
-              <TabsTrigger value="instagram">Instagram</TabsTrigger>
-              <TabsTrigger value="facebook">Facebook</TabsTrigger>
-            </TabsList>
-          </Tabs>
+        {/* Search, Filters, and View Toggle */}
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            {/* Search */}
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by title or embed ID..."
+                value={searchQuery}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            
+            {/* Analytics Link */}
+            <Button variant="outline" asChild>
+              <Link to="/admin/social/analytics">
+                <BarChart3 className="w-4 h-4 mr-2" />
+                View Analytics
+              </Link>
+            </Button>
+          </div>
 
-          <div className="flex gap-1 bg-secondary rounded-lg p-1">
-            <Button
-              variant={viewMode === 'table' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setViewMode('table')}
-              className="h-8 px-3"
-            >
-              <List className="w-4 h-4" />
-            </Button>
-            <Button
-              variant={viewMode === 'grid' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setViewMode('grid')}
-              className="h-8 px-3"
-            >
-              <Grid className="w-4 h-4" />
-            </Button>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <Tabs value={platformFilter} onValueChange={(v) => handleFilterChange(v as typeof platformFilter)}>
+              <TabsList>
+                <TabsTrigger value="all">All ({posts.length})</TabsTrigger>
+                <TabsTrigger value="tiktok">TikTok</TabsTrigger>
+                <TabsTrigger value="youtube">YouTube</TabsTrigger>
+                <TabsTrigger value="instagram">Instagram</TabsTrigger>
+                <TabsTrigger value="facebook">Facebook</TabsTrigger>
+              </TabsList>
+            </Tabs>
+
+            <div className="flex gap-1 bg-secondary rounded-lg p-1">
+              <Button
+                variant={viewMode === 'table' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('table')}
+                className="h-8 px-3"
+              >
+                <List className="w-4 h-4" />
+              </Button>
+              <Button
+                variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('grid')}
+                className="h-8 px-3"
+              >
+                <Grid className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
         </div>
 
