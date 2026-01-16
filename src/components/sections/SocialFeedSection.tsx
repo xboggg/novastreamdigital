@@ -56,6 +56,26 @@ const platformConfig: Record<Platform, { label: string; icon: React.ReactNode; g
   },
 };
 
+// Track click (when user clicks on a post thumbnail)
+const trackClick = async (postId: string) => {
+  try {
+    await supabase.rpc('increment_social_post_click', { post_id: postId });
+  } catch (error) {
+    // Silent fail - don't interrupt user experience
+    console.error('Failed to track click:', error);
+  }
+};
+
+// Track view (when user watches the video in modal)
+const trackView = async (postId: string) => {
+  try {
+    await supabase.rpc('increment_social_post_view', { post_id: postId });
+  } catch (error) {
+    // Silent fail - don't interrupt user experience
+    console.error('Failed to track view:', error);
+  }
+};
+
 export const SocialFeedSection = () => {
   const [selectedPost, setSelectedPost] = useState<SocialPost | null>(null);
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
@@ -94,6 +114,17 @@ export const SocialFeedSection = () => {
     
     return () => clearInterval(interval);
   }, [emblaApi, autoplay, posts.length]);
+
+  const handlePostClick = (post: SocialPost) => {
+    trackClick(post.id);
+    setSelectedPost(post);
+  };
+
+  const handlePostView = useCallback(() => {
+    if (selectedPost) {
+      trackView(selectedPost.id);
+    }
+  }, [selectedPost]);
 
   if (posts.length === 0) return null;
 
@@ -144,7 +175,7 @@ export const SocialFeedSection = () => {
                 >
                   <div
                     className="group relative aspect-[9/16] rounded-2xl overflow-hidden bg-card border border-border cursor-pointer hover:border-primary/50 transition-all duration-300"
-                    onClick={() => setSelectedPost(post)}
+                    onClick={() => handlePostClick(post)}
                   >
                     {/* Thumbnail or placeholder */}
                     {post.thumbnail_url ? (
@@ -223,6 +254,7 @@ export const SocialFeedSection = () => {
           platform={selectedPost.platform}
           embedId={selectedPost.embed_id}
           title={selectedPost.title || undefined}
+          onView={handlePostView}
         />
       )}
     </>
