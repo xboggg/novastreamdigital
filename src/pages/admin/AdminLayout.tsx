@@ -12,6 +12,7 @@ import {
   LogOut,
   Menu,
   X,
+  Video,
 } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
@@ -25,6 +26,7 @@ const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/admin' },
   { icon: FolderKanban, label: 'Projects', path: '/admin/projects' },
   { icon: FileText, label: 'Blog Posts', path: '/admin/posts' },
+  { icon: Video, label: 'Social Media', path: '/admin/social' },
   { icon: MessageSquare, label: 'Testimonials', path: '/admin/testimonials' },
   { icon: Users, label: 'Leads', path: '/admin/leads' },
   { icon: Mail, label: 'Newsletter', path: '/admin/newsletter' },
