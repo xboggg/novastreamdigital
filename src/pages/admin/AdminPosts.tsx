@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Pencil, Trash2, Eye, EyeOff, Clock, Upload, X } from 'lucide-react';
+import { Plus, Pencil, Trash2, Eye, EyeOff, Clock, Upload, X, Copy } from 'lucide-react';
 import AdminLayout from './AdminLayout';
 import { Button } from '@/components/ui/button';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
@@ -212,6 +212,30 @@ const AdminPosts = () => {
     if (error) {
       toast({ variant: 'destructive', title: 'Error', description: error.message });
     } else {
+      fetchPosts();
+    }
+  };
+
+  const duplicatePost = async (post: Post) => {
+    const duplicatedData = {
+      title: `${post.title} (Copy)`,
+      slug: post.slug ? `${post.slug}-copy-${Date.now()}` : null,
+      excerpt: post.excerpt,
+      content: post.content,
+      category: post.category,
+      featured_image: post.featured_image,
+      tags: post.tags,
+      reading_time: post.reading_time,
+      status: 'draft' as const,
+      published_at: null,
+    };
+
+    const { error } = await supabase.from('posts').insert(duplicatedData);
+
+    if (error) {
+      toast({ variant: 'destructive', title: 'Error', description: error.message });
+    } else {
+      toast({ title: 'Success', description: 'Post duplicated successfully' });
       fetchPosts();
     }
   };
@@ -442,6 +466,13 @@ const AdminPosts = () => {
                   ) : (
                     <Eye className="w-4 h-4 text-muted-foreground" />
                   )}
+                </button>
+                <button
+                  onClick={() => duplicatePost(post)}
+                  className="p-2 rounded-lg hover:bg-secondary transition-colors"
+                  title="Duplicate post"
+                >
+                  <Copy className="w-4 h-4 text-muted-foreground" />
                 </button>
                 <button
                   onClick={() => openEditDialog(post)}

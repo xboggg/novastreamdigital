@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Pencil, Trash2, Eye, EyeOff, Star, StarOff, Upload, X } from 'lucide-react';
+import { Plus, Pencil, Trash2, Eye, EyeOff, Star, StarOff, Upload, X, Copy } from 'lucide-react';
 import AdminLayout from './AdminLayout';
 import { Button } from '@/components/ui/button';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
@@ -222,6 +222,29 @@ const AdminProjects = () => {
     if (error) {
       toast({ variant: 'destructive', title: 'Error', description: error.message });
     } else {
+      fetchProjects();
+    }
+  };
+
+  const duplicateProject = async (project: Project) => {
+    const duplicatedData = {
+      title: `${project.title} (Copy)`,
+      slug: project.slug ? `${project.slug}-copy-${Date.now()}` : null,
+      description: project.description,
+      content: project.content,
+      category: project.category,
+      image_url: project.image_url,
+      tags: project.tags,
+      featured: false,
+      status: 'draft' as const,
+    };
+
+    const { error } = await supabase.from('projects').insert(duplicatedData);
+
+    if (error) {
+      toast({ variant: 'destructive', title: 'Error', description: error.message });
+    } else {
+      toast({ title: 'Success', description: 'Project duplicated successfully' });
       fetchProjects();
     }
   };
@@ -463,6 +486,13 @@ const AdminProjects = () => {
                   ) : (
                     <Eye className="w-4 h-4 text-muted-foreground" />
                   )}
+                </button>
+                <button
+                  onClick={() => duplicateProject(project)}
+                  className="p-2 rounded-lg hover:bg-secondary transition-colors"
+                  title="Duplicate project"
+                >
+                  <Copy className="w-4 h-4 text-muted-foreground" />
                 </button>
                 <button
                   onClick={() => openEditDialog(project)}
