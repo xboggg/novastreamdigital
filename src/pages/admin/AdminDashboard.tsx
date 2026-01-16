@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { FolderKanban, FileText, MessageSquare, Users, ArrowRight, TrendingUp, Mail } from 'lucide-react';
-import { Area, AreaChart, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { FolderKanban, FileText, MessageSquare, Users, ArrowRight, TrendingUp, Mail, BarChart3, PieChart } from 'lucide-react';
+import { Area, AreaChart, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart as RechartsPie, Pie, Cell } from 'recharts';
 import AdminLayout from './AdminLayout';
 import { supabase } from '@/integrations/supabase/client';
-import { format, subDays, startOfDay } from 'date-fns';
+import { format, subDays } from 'date-fns';
 
 interface Stats {
   projects: number;
@@ -16,9 +16,15 @@ interface Stats {
   subscribers: number;
 }
 
-interface SubscriberGrowthData {
+interface GrowthData {
   date: string;
   count: number;
+}
+
+interface SourceData {
+  name: string;
+  value: number;
+  color: string;
 }
 
 const AdminDashboard = () => {
@@ -31,7 +37,10 @@ const AdminDashboard = () => {
     subscribers: 0,
   });
   const [recentLeads, setRecentLeads] = useState<any[]>([]);
-  const [subscriberGrowth, setSubscriberGrowth] = useState<SubscriberGrowthData[]>([]);
+  const [subscriberGrowth, setSubscriberGrowth] = useState<GrowthData[]>([]);
+  const [leadsGrowth, setLeadsGrowth] = useState<GrowthData[]>([]);
+  const [subscriberSources, setSubscriberSources] = useState<SourceData[]>([]);
+  const [conversionRate, setConversionRate] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -68,13 +77,28 @@ const AdminDashboard = () => {
         const thirtyDaysAgo = subDays(new Date(), 30).toISOString();
         const { data: subscribers } = await supabase
           .from('newsletter_subscribers')
-          .select('subscribed_at')
+          .select('subscribed_at, source')
           .gte('subscribed_at', thirtyDaysAgo)
           .order('subscribed_at', { ascending: true });
+
+        // Fetch leads growth data for last 30 days
+        const { data: leadsData } = await supabase
+          .from('leads')
+          .select('created_at')
+          .gte('created_at', thirtyDaysAgo)
+          .order('created_at', { ascending: true });
+
+        // Calculate conversion rate (subscribers / leads)
+        const totalLeads = leadsRes.count || 0;
+        const totalSubscribers = subscribersRes.count || 0;
+        if (totalLeads > 0) {
+          setConversionRate(Math.round((totalSubscribers / totalLeads) * 100));
+        }
 
         // Process subscriber data into cumulative growth
         if (subscribers && subscribers.length > 0) {
           const dailyCounts: Record<string, number> = {};
+          const sourceCounts: Record<string, number> = {};
           
           // Initialize all 30 days with 0
           for (let i = 30; i >= 0; i--) {
@@ -82,17 +106,19 @@ const AdminDashboard = () => {
             dailyCounts[date] = 0;
           }
 
-          // Count subscribers per day
+          // Count subscribers per day and by source
           subscribers.forEach((sub) => {
             const date = format(new Date(sub.subscribed_at), 'yyyy-MM-dd');
             if (dailyCounts[date] !== undefined) {
               dailyCounts[date]++;
             }
+            const source = sub.source || 'website';
+            sourceCounts[source] = (sourceCounts[source] || 0) + 1;
           });
 
           // Convert to cumulative counts
           let cumulative = 0;
-          const growthData: SubscriberGrowthData[] = Object.entries(dailyCounts)
+          const growthData: GrowthData[] = Object.entries(dailyCounts)
             .sort(([a], [b]) => a.localeCompare(b))
             .map(([date, count]) => {
               cumulative += count;
@@ -103,6 +129,52 @@ const AdminDashboard = () => {
             });
 
           setSubscriberGrowth(growthData);
+
+          // Process source data for pie chart
+          const sourceColors: Record<string, string> = {
+            homepage: 'hsl(var(--primary))',
+            footer: 'hsl(221, 83%, 53%)',
+            website: 'hsl(142, 76%, 36%)',
+            blog: 'hsl(262, 83%, 58%)',
+          };
+          
+          const sourceData: SourceData[] = Object.entries(sourceCounts).map(([name, value]) => ({
+            name: name.charAt(0).toUpperCase() + name.slice(1),
+            value,
+            color: sourceColors[name] || 'hsl(var(--muted-foreground))',
+          }));
+          
+          setSubscriberSources(sourceData);
+        }
+
+        // Process leads growth data
+        if (leadsData && leadsData.length > 0) {
+          const dailyCounts: Record<string, number> = {};
+          
+          for (let i = 30; i >= 0; i--) {
+            const date = format(subDays(new Date(), i), 'yyyy-MM-dd');
+            dailyCounts[date] = 0;
+          }
+
+          leadsData.forEach((lead) => {
+            const date = format(new Date(lead.created_at), 'yyyy-MM-dd');
+            if (dailyCounts[date] !== undefined) {
+              dailyCounts[date]++;
+            }
+          });
+
+          let cumulative = 0;
+          const growthData: GrowthData[] = Object.entries(dailyCounts)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([date, count]) => {
+              cumulative += count;
+              return {
+                date: format(new Date(date), 'MMM d'),
+                count: cumulative,
+              };
+            });
+
+          setLeadsGrowth(growthData);
         }
       } catch (error) {
         console.error('Error fetching stats:', error);
@@ -172,6 +244,35 @@ const AdminDashboard = () => {
         ))}
       </div>
 
+      {/* Conversion Metrics */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.35 }}
+        className="card-premium p-6 mb-8"
+      >
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500">
+            <BarChart3 className="w-4 h-4 text-white" />
+          </div>
+          <h2 className="text-xl font-semibold">Conversion Metrics</h2>
+        </div>
+        <div className="grid sm:grid-cols-3 gap-6">
+          <div className="text-center p-4 rounded-xl bg-secondary/50">
+            <p className="text-3xl font-bold text-primary">{stats.leads}</p>
+            <p className="text-sm text-muted-foreground">Total Leads</p>
+          </div>
+          <div className="text-center p-4 rounded-xl bg-secondary/50">
+            <p className="text-3xl font-bold text-primary">{stats.subscribers}</p>
+            <p className="text-sm text-muted-foreground">Total Subscribers</p>
+          </div>
+          <div className="text-center p-4 rounded-xl bg-secondary/50">
+            <p className="text-3xl font-bold text-emerald-500">{conversionRate}%</p>
+            <p className="text-sm text-muted-foreground">Lead-to-Subscriber Ratio</p>
+          </div>
+        </div>
+      </motion.div>
+
       {/* Charts Grid */}
       <div className="grid lg:grid-cols-2 gap-6 mb-8">
         {/* Subscriber Growth Chart */}
@@ -207,8 +308,8 @@ const AdminDashboard = () => {
                 <AreaChart data={subscriberGrowth} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="subscriberGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                      <stop offset="5%" stopColor="hsl(38, 92%, 50%)" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="hsl(38, 92%, 50%)" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <XAxis 
@@ -238,7 +339,7 @@ const AdminDashboard = () => {
                   <Area
                     type="monotone"
                     dataKey="count"
-                    stroke="hsl(var(--primary))"
+                    stroke="hsl(38, 92%, 50%)"
                     strokeWidth={2}
                     fill="url(#subscriberGradient)"
                   />
@@ -248,11 +349,153 @@ const AdminDashboard = () => {
           )}
         </motion.div>
 
-        {/* Recent Leads */}
+        {/* Leads Growth Chart */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45 }}
+          className="card-premium p-6"
+        >
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-gradient-to-br from-rose-500 to-pink-500">
+                <Users className="w-4 h-4 text-white" />
+              </div>
+              <h2 className="text-xl font-semibold">Leads Growth</h2>
+            </div>
+            <Link
+              to="/admin/leads"
+              className="text-sm text-primary hover:underline flex items-center gap-1"
+            >
+              View all
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          {leadsGrowth.length === 0 ? (
+            <p className="text-muted-foreground text-center py-12">
+              No leads data yet. Growth will appear here as leads come in.
+            </p>
+          ) : (
+            <div className="h-[250px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={leadsGrowth} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="leadsGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(346, 77%, 50%)" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="hsl(346, 77%, 50%)" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis 
+                    dataKey="date" 
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                    tickMargin={8}
+                  />
+                  <YAxis 
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                    tickMargin={8}
+                    allowDecimals={false}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'hsl(var(--card))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                    }}
+                    labelStyle={{ color: 'hsl(var(--foreground))' }}
+                    formatter={(value: number) => [`${value} leads`, 'Total']}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="count"
+                    stroke="hsl(346, 77%, 50%)"
+                    strokeWidth={2}
+                    fill="url(#leadsGradient)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+        </motion.div>
+      </div>
+
+      {/* Bottom Grid: Sources and Recent Leads */}
+      <div className="grid lg:grid-cols-2 gap-6 mb-8">
+        {/* Subscriber Sources */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
+          className="card-premium p-6"
+        >
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 rounded-lg bg-gradient-to-br from-violet-500 to-purple-500">
+              <PieChart className="w-4 h-4 text-white" />
+            </div>
+            <h2 className="text-xl font-semibold">Subscriber Sources</h2>
+          </div>
+
+          {subscriberSources.length === 0 ? (
+            <p className="text-muted-foreground text-center py-12">
+              No source data yet. Analytics will appear as subscribers sign up.
+            </p>
+          ) : (
+            <div className="flex items-center gap-6">
+              <div className="h-[200px] w-[200px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <RechartsPie>
+                    <Pie
+                      data={subscriberSources}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={50}
+                      outerRadius={80}
+                      paddingAngle={2}
+                      dataKey="value"
+                    >
+                      {subscriberSources.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'hsl(var(--card))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px',
+                      }}
+                      formatter={(value: number, name: string) => [`${value} subscribers`, name]}
+                    />
+                  </RechartsPie>
+                </ResponsiveContainer>
+              </div>
+              <div className="flex-1 space-y-3">
+                {subscriberSources.map((source) => (
+                  <div key={source.name} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div 
+                        className="w-3 h-3 rounded-full" 
+                        style={{ backgroundColor: source.color }}
+                      />
+                      <span className="text-sm">{source.name}</span>
+                    </div>
+                    <span className="text-sm font-medium">{source.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </motion.div>
+
+        {/* Recent Leads */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.55 }}
           className="card-premium p-6"
         >
           <div className="flex items-center justify-between mb-6">
