@@ -364,7 +364,48 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      social_posts_public: {
+        Row: {
+          created_at: string | null
+          display_order: number | null
+          embed_id: string | null
+          id: string | null
+          is_featured: boolean | null
+          platform: string | null
+          status: Database["public"]["Enums"]["content_status"] | null
+          thumbnail_url: string | null
+          title: string | null
+          updated_at: string | null
+          video_url: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          display_order?: number | null
+          embed_id?: string | null
+          id?: string | null
+          is_featured?: boolean | null
+          platform?: string | null
+          status?: Database["public"]["Enums"]["content_status"] | null
+          thumbnail_url?: string | null
+          title?: string | null
+          updated_at?: string | null
+          video_url?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          display_order?: number | null
+          embed_id?: string | null
+          id?: string | null
+          is_featured?: boolean | null
+          platform?: string | null
+          status?: Database["public"]["Enums"]["content_status"] | null
+          thumbnail_url?: string | null
+          title?: string | null
+          updated_at?: string | null
+          video_url?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       increment_social_post_click: {

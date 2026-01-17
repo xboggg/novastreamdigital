@@ -89,15 +89,15 @@ export const SocialFeedSection = () => {
   const { data: posts = [] } = useQuery({
     queryKey: ['social-posts-public'],
     queryFn: async () => {
+      // Use the public view which excludes analytics columns (view_count, click_count)
       const { data, error } = await supabase
-        .from('social_posts')
+        .from('social_posts_public' as any)
         .select('id, platform, video_url, embed_id, title, thumbnail_url')
-        .eq('status', 'published')
         .eq('is_featured', true)
         .order('display_order', { ascending: true });
       
       if (error) throw error;
-      return data as SocialPost[];
+      return (data || []) as unknown as SocialPost[];
     },
   });
 
