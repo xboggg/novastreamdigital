@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/hooks/useTheme";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { InstallPromptBanner } from "@/components/pwa/InstallPromptBanner";
 import Index from "./pages/Index";
 import Services from "./pages/Services";
 import Portfolio from "./pages/Portfolio";
@@ -15,6 +16,7 @@ import Insights from "./pages/Insights";
 import PostDetail from "./pages/PostDetail";
 import Contact from "./pages/Contact";
 import Pricing from "./pages/Pricing";
+import Install from "./pages/Install";
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -37,6 +39,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <InstallPromptBanner />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/services" element={<Services />} />
@@ -47,6 +50,7 @@ const App = () => (
               <Route path="/insights/:slug" element={<PostDetail />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/pricing" element={<Pricing />} />
+              <Route path="/install" element={<Install />} />
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
               <Route path="/admin/projects" element={<ProtectedRoute requireAdmin><AdminProjects /></ProtectedRoute>} />
