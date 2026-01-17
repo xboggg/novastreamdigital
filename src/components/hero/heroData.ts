@@ -26,9 +26,9 @@ export const heroServices: HeroService[] = [
     title: 'Website Design & Development',
     tagline: 'Captivating Digital Presence',
     description: 'We craft stunning, high-performance websites that captivate visitors and convert them into loyal customers.',
-    // Dark coding/tech video - Pexels
-    videoUrl: 'https://videos.pexels.com/video-files/5380642/5380642-uhd_2560_1440_25fps.mp4',
-    posterUrl: 'https://images.pexels.com/videos/5380642/free-video-5380642.jpg?auto=compress&cs=tinysrgb&w=1920',
+    // Modern workspace/coding - Pexels
+    videoUrl: 'https://videos.pexels.com/video-files/3130284/3130284-uhd_2560_1440_30fps.mp4',
+    posterUrl: 'https://images.pexels.com/videos/3130284/free-video-3130284.jpg?auto=compress&cs=tinysrgb&w=1920',
     colors: {
       primary: 'hsl(217, 91%, 60%)',
       secondary: 'hsl(186, 100%, 42%)',
@@ -83,9 +83,9 @@ export const heroServices: HeroService[] = [
     title: 'Ongoing Digital Care',
     tagline: 'Continuous Growth & Support',
     description: 'Dedicated partnership to maintain, optimize, and evolve your digital presence as your business grows.',
-    // Business/growth video - Pexels
-    videoUrl: 'https://videos.pexels.com/video-files/7989479/7989479-uhd_2732_1440_25fps.mp4',
-    posterUrl: 'https://images.pexels.com/videos/7989479/pexels-photo-7989479.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    // Team collaboration/support - Pexels
+    videoUrl: 'https://videos.pexels.com/video-files/3209828/3209828-uhd_2560_1440_25fps.mp4',
+    posterUrl: 'https://images.pexels.com/videos/3209828/free-video-3209828.jpg?auto=compress&cs=tinysrgb&w=1920',
     colors: {
       primary: 'hsl(160, 84%, 39%)',
       secondary: 'hsl(172, 66%, 50%)',
