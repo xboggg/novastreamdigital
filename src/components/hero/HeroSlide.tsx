@@ -12,46 +12,55 @@ interface HeroSlideProps {
   mouseY: number;
 }
 
-const easeOutCubic: Easing = [0.25, 0.46, 0.45, 0.94];
-const easeInOut: Easing = [0.42, 0, 0.58, 1];
-const easeOut: Easing = [0, 0, 0.2, 1];
+// Custom easing curves for cinematic feel
+const easeOutExpo: Easing = [0.16, 1, 0.3, 1];
+const easeInOutQuart: Easing = [0.76, 0, 0.24, 1];
+const easeOutBack: Easing = [0.34, 1.56, 0.64, 1];
 
 const contentVariants = {
   hidden: { 
     opacity: 0, 
-    x: -60,
-    filter: 'blur(10px)',
+    x: -80,
+    scale: 0.98,
+    filter: 'blur(12px)',
   },
   visible: {
     opacity: 1,
     x: 0,
+    scale: 1,
     filter: 'blur(0px)',
     transition: {
-      duration: 0.8,
-      ease: easeOutCubic,
-      staggerChildren: 0.1,
-      delayChildren: 0.2,
+      duration: 1,
+      ease: easeOutExpo,
+      staggerChildren: 0.12,
+      delayChildren: 0.15,
     },
   },
   exit: {
     opacity: 0,
-    x: 60,
-    filter: 'blur(10px)',
+    x: 80,
+    scale: 0.98,
+    filter: 'blur(12px)',
     transition: {
-      duration: 0.5,
-      ease: easeInOut,
+      duration: 0.6,
+      ease: easeInOutQuart,
     },
   },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 30, scale: 0.95 },
   visible: { 
     opacity: 1, 
     y: 0,
-    transition: { duration: 0.6, ease: easeOut },
+    scale: 1,
+    transition: { duration: 0.7, ease: easeOutExpo },
   },
-  exit: { opacity: 0, y: -20 },
+  exit: { 
+    opacity: 0, 
+    y: -20,
+    transition: { duration: 0.4, ease: easeInOutQuart },
+  },
 };
 
 export const HeroSlide = ({ service, isActive, mouseX, mouseY }: HeroSlideProps) => {
@@ -161,17 +170,18 @@ export const HeroSlide = ({ service, isActive, mouseX, mouseY }: HeroSlideProps)
         </div>
       </div>
 
-      {/* Floating decorative elements */}
+      {/* Floating decorative elements with enhanced parallax */}
       <ParallaxLayer 
         offsetX={mouseX} 
         offsetY={mouseY} 
         intensity={0.08}
+        smoothness="high"
         className="absolute top-1/4 right-1/4 hidden lg:block"
       >
         <motion.div
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 0.6 }}
-          transition={{ delay: 0.5, duration: 0.8 }}
+          initial={{ scale: 0, opacity: 0, rotate: -180 }}
+          animate={{ scale: 1, opacity: 0.6, rotate: 0 }}
+          transition={{ delay: 0.4, duration: 1.2, ease: easeOutExpo }}
           className="w-32 h-32 rounded-full"
           style={{
             background: `radial-gradient(circle, ${service.colors.primary}40, transparent 70%)`,
@@ -184,12 +194,16 @@ export const HeroSlide = ({ service, isActive, mouseX, mouseY }: HeroSlideProps)
         offsetX={mouseX} 
         offsetY={mouseY} 
         intensity={0.06}
+        smoothness="high"
         className="absolute bottom-1/3 right-1/3 hidden lg:block"
       >
         <motion.div
           initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 0.4 }}
-          transition={{ delay: 0.7, duration: 0.8 }}
+          animate={{ 
+            scale: [0, 1.1, 1], 
+            opacity: 0.4,
+          }}
+          transition={{ delay: 0.6, duration: 1, ease: easeOutBack }}
           className="w-48 h-48 rounded-full"
           style={{
             background: `radial-gradient(circle, ${service.colors.secondary}30, transparent 70%)`,
@@ -202,15 +216,42 @@ export const HeroSlide = ({ service, isActive, mouseX, mouseY }: HeroSlideProps)
         offsetX={mouseX} 
         offsetY={mouseY} 
         intensity={0.1}
+        smoothness="low"
         className="absolute top-1/2 right-[15%] hidden xl:block"
       >
         <motion.div
-          initial={{ scale: 0, rotate: -45 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ delay: 0.6, duration: 0.8, type: 'spring' }}
+          initial={{ scale: 0, rotate: -90, opacity: 0 }}
+          animate={{ scale: 1, rotate: 0, opacity: 1 }}
+          transition={{ 
+            delay: 0.5, 
+            duration: 1, 
+            type: 'spring',
+            stiffness: 80,
+            damping: 15,
+          }}
           className="w-20 h-20 border border-white/10 rounded-2xl backdrop-blur-sm"
           style={{
             background: `linear-gradient(135deg, ${service.colors.primary}10, transparent)`,
+          }}
+        />
+      </ParallaxLayer>
+
+      {/* Additional floating accent */}
+      <ParallaxLayer 
+        offsetX={mouseX} 
+        offsetY={mouseY} 
+        intensity={0.12}
+        smoothness="high"
+        className="absolute top-[20%] right-[10%] hidden xl:block"
+      >
+        <motion.div
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 0.3 }}
+          transition={{ delay: 0.8, duration: 1.2, ease: easeOutExpo }}
+          className="w-24 h-24 rounded-full"
+          style={{
+            background: `radial-gradient(circle, ${service.colors.primary}25, transparent 60%)`,
+            filter: 'blur(25px)',
           }}
         />
       </ParallaxLayer>
