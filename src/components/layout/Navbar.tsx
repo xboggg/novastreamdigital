@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useTheme } from '@/hooks/useTheme';
 
 const navLinks = [
+  { name: 'Home', href: '/' },
   { name: 'Services', href: '/services' },
   { name: 'Portfolio', href: '/portfolio' },
   { name: 'About', href: '/about' },

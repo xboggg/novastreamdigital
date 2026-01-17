@@ -81,14 +81,14 @@ export const VideoBackground = ({ service, isActive, mouseX, mouseY }: VideoBack
             />
           )}
 
-          {/* Color gradient overlay */}
+          {/* Color gradient overlay - reduced opacity */}
           <div 
             className="absolute inset-0"
             style={{
               background: `
                 linear-gradient(135deg, 
-                  ${service.colors.primary}90 0%, 
-                  ${service.colors.secondary}60 50%,
+                  ${service.colors.primary}50 0%, 
+                  ${service.colors.secondary}30 50%,
                   transparent 100%
                 )
               `,
@@ -96,15 +96,15 @@ export const VideoBackground = ({ service, isActive, mouseX, mouseY }: VideoBack
             }}
           />
 
-          {/* Secondary gradient for depth */}
+          {/* Secondary gradient for depth - reduced opacity */}
           <div 
             className="absolute inset-0"
             style={{
               background: `
                 linear-gradient(to right, 
                   hsl(var(--background)) 0%,
-                  hsl(var(--background) / 0.7) 30%,
-                  transparent 60%
+                  hsl(var(--background) / 0.5) 25%,
+                  transparent 50%
                 )
               `,
             }}
