@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/hooks/useTheme";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { InstallPromptBanner } from "@/components/pwa/InstallPromptBanner";
+import { NotificationPrompt } from "@/components/pwa/NotificationPrompt";
 import Index from "./pages/Index";
 import Services from "./pages/Services";
 import Portfolio from "./pages/Portfolio";
@@ -40,6 +41,7 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <InstallPromptBanner />
+            <NotificationPrompt />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/services" element={<Services />} />
