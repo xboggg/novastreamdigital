@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { PageTransition } from "@/components/layout/PageTransition";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import DOMPurify from "dompurify";
 
 const PostDetail = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -164,7 +165,7 @@ const PostDetail = () => {
             className="prose prose-lg dark:prose-invert max-w-none"
           >
             {post.content ? (
-              <div dangerouslySetInnerHTML={{ __html: post.content }} />
+              <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }} />
             ) : (
               <p className="text-muted-foreground">
                 Full article content coming soon.
