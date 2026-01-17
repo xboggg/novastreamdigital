@@ -1,5 +1,5 @@
-import { motion } from 'framer-motion';
-import { ReactNode } from 'react';
+import { motion, useSpring, useTransform } from 'framer-motion';
+import { ReactNode, useMemo } from 'react';
 
 interface ParallaxLayerProps {
   children: ReactNode;
@@ -7,7 +7,14 @@ interface ParallaxLayerProps {
   offsetY: number;
   intensity?: number;
   className?: string;
+  smoothness?: 'low' | 'medium' | 'high';
 }
+
+const smoothnessConfig = {
+  low: { stiffness: 100, damping: 20 },
+  medium: { stiffness: 50, damping: 25 },
+  high: { stiffness: 25, damping: 30 },
+};
 
 export const ParallaxLayer = ({
   children,
@@ -15,19 +22,35 @@ export const ParallaxLayer = ({
   offsetY,
   intensity = 1,
   className = '',
+  smoothness = 'medium',
 }: ParallaxLayerProps) => {
+  const config = smoothnessConfig[smoothness];
+  
+  const springX = useSpring(offsetX * intensity, {
+    stiffness: config.stiffness,
+    damping: config.damping,
+    mass: 0.8,
+  });
+  
+  const springY = useSpring(offsetY * intensity, {
+    stiffness: config.stiffness,
+    damping: config.damping,
+    mass: 0.8,
+  });
+
+  // Update spring values when offsets change
+  useMemo(() => {
+    springX.set(offsetX * intensity);
+    springY.set(offsetY * intensity);
+  }, [offsetX, offsetY, intensity, springX, springY]);
+
   return (
     <motion.div
       className={className}
-      animate={{
-        x: offsetX * intensity,
-        y: offsetY * intensity,
-      }}
-      transition={{
-        type: 'spring',
-        stiffness: 50,
-        damping: 30,
-        mass: 0.5,
+      style={{
+        x: springX,
+        y: springY,
+        willChange: 'transform',
       }}
     >
       {children}
