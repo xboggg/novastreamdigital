@@ -1,104 +1,137 @@
-import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { GradientBackground } from '@/components/three/GradientBackground';
+import { useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useMouseParallax } from '@/hooks/useMouseParallax';
+import { heroServices } from '@/components/hero/heroData';
+import { VideoBackground } from '@/components/hero/VideoBackground';
+import { HeroSlide } from '@/components/hero/HeroSlide';
+import { HeroNavigation } from '@/components/hero/HeroNavigation';
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.15,
-      delayChildren: 0.3,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.6,
-      ease: 'easeOut' as const,
-    },
-  },
-};
+const SLIDE_DURATION = 6000; // 6 seconds per slide
+const PROGRESS_INTERVAL = 50; // Update progress every 50ms
 
 export const HeroSection = () => {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const { x, y } = useMouseParallax(1);
+
+  // Auto-rotate slides
+  useEffect(() => {
+    if (isPaused) return;
+
+    const progressTimer = setInterval(() => {
+      setProgress((prev) => {
+        const next = prev + (PROGRESS_INTERVAL / SLIDE_DURATION);
+        if (next >= 1) {
+          setActiveIndex((current) => (current + 1) % heroServices.length);
+          return 0;
+        }
+        return next;
+      });
+    }, PROGRESS_INTERVAL);
+
+    return () => clearInterval(progressTimer);
+  }, [isPaused]);
+
+  // Handle navigation
+  const handleNavigate = useCallback((index: number) => {
+    setActiveIndex(index);
+    setProgress(0);
+  }, []);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        handleNavigate((activeIndex + 1) % heroServices.length);
+      } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        handleNavigate((activeIndex - 1 + heroServices.length) % heroServices.length);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeIndex, handleNavigate]);
+
+  const activeService = heroServices[activeIndex];
+
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* WebGL Background */}
-      <GradientBackground />
-      
-      {/* Noise overlay */}
-      <div className="absolute inset-0 noise-overlay pointer-events-none" />
-      
-      {/* Gradient overlays for depth */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/40 to-background pointer-events-none" />
-      <div className="absolute inset-0 bg-gradient-to-r from-background/50 via-transparent to-background/50 pointer-events-none" />
-      
-      {/* Content */}
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="container-custom relative z-10 text-center pt-20"
-      >
-        <motion.div variants={itemVariants} className="mb-6">
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-secondary/80 backdrop-blur-sm border border-border/50 text-sm text-muted-foreground">
-            <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            Digital Studio for Modern Brands
-          </span>
-        </motion.div>
+    <section 
+      className="relative min-h-screen flex items-center justify-center overflow-hidden"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
+      {/* Video backgrounds */}
+      {heroServices.map((service, index) => (
+        <VideoBackground
+          key={service.id}
+          service={service}
+          isActive={index === activeIndex}
+          mouseX={x}
+          mouseY={y}
+        />
+      ))}
 
-        <motion.h1
-          variants={itemVariants}
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 max-w-4xl mx-auto text-balance"
-        >
-          Designing Digital Experiences{' '}
-          <span className="gradient-text">That Flow</span>
-        </motion.h1>
+      {/* Content slides */}
+      <AnimatePresence mode="wait">
+        <HeroSlide
+          key={activeService.id}
+          service={activeService}
+          isActive={true}
+          mouseX={x}
+          mouseY={y}
+        />
+      </AnimatePresence>
 
-        <motion.p
-          variants={itemVariants}
-          className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed"
-        >
-          We design and build refined digital experiences for modern businesses. 
-          From captivating websites to powerful web applications.
-        </motion.p>
+      {/* Navigation */}
+      <HeroNavigation
+        activeIndex={activeIndex}
+        onNavigate={handleNavigate}
+        progress={progress}
+      />
 
-        <motion.div
-          variants={itemVariants}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4"
-        >
-          <Button variant="hero" size="xl" asChild>
-            <Link to="/portfolio" className="group">
-              View Our Work
-              <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-            </Link>
-          </Button>
-          <Button variant="heroOutline" size="xl" asChild>
-            <Link to="/contact">Start a Project</Link>
-          </Button>
-        </motion.div>
-
-        {/* Scroll indicator */}
-        <motion.div
-          variants={itemVariants}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-        >
+      {/* Bottom progress bar */}
+      <div className="absolute bottom-0 left-0 right-0 z-30">
+        <div className="h-1 bg-white/10">
           <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-            className="w-6 h-10 rounded-full border-2 border-muted-foreground/30 flex items-start justify-center p-2"
-          >
-            <motion.div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50" />
-          </motion.div>
+            className="h-full"
+            style={{
+              background: activeService.colors.gradient,
+              width: `${progress * 100}%`,
+            }}
+            transition={{ duration: 0.1 }}
+          />
+        </div>
+      </div>
+
+      {/* Scroll indicator */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1, duration: 0.6 }}
+        className="absolute bottom-12 left-1/2 -translate-x-1/2 z-30"
+      >
+        <motion.div
+          animate={{ y: [0, 8, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          className="w-6 h-10 rounded-full border-2 border-white/30 flex items-start justify-center p-2"
+        >
+          <motion.div className="w-1.5 h-1.5 rounded-full bg-white/50" />
         </motion.div>
       </motion.div>
+
+      {/* Service counter */}
+      <div className="absolute bottom-12 left-6 md:left-10 z-30 hidden md:flex items-center gap-4">
+        <span className="text-5xl font-bold text-white/20">
+          {String(activeIndex + 1).padStart(2, '0')}
+        </span>
+        <div className="h-12 w-px bg-white/20" />
+        <span className="text-sm text-white/50 uppercase tracking-widest">
+          {String(heroServices.length).padStart(2, '0')} Services
+        </span>
+      </div>
     </section>
   );
 };
