@@ -12,6 +12,7 @@ interface VideoBackgroundProps {
 export const VideoBackground = ({ service, isActive, mouseX, mouseY }: VideoBackgroundProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     if (videoRef.current) {
@@ -27,6 +28,11 @@ export const VideoBackground = ({ service, isActive, mouseX, mouseY }: VideoBack
 
   const handleLoadedData = () => {
     setIsLoaded(true);
+    setHasError(false);
+  };
+
+  const handleError = () => {
+    setHasError(true);
   };
 
   // Calculate subtle parallax offset for background
@@ -66,76 +72,72 @@ export const VideoBackground = ({ service, isActive, mouseX, mouseY }: VideoBack
               playsInline
               preload="auto"
               onLoadedData={handleLoadedData}
+              onError={handleError}
               className="absolute inset-0 w-full h-full object-cover scale-105"
               style={{
-                filter: 'brightness(0.7) saturate(1.1)',
+                filter: 'brightness(0.85) saturate(1.2)',
               }}
             />
           </motion.div>
 
-          {/* Loading state - show poster with gradient */}
-          {!isLoaded && (
+          {/* Fallback gradient background when video fails */}
+          {hasError && (
             <div 
-              className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${service.posterUrl})` }}
+              className="absolute inset-0"
+              style={{
+                background: `
+                  linear-gradient(135deg, 
+                    ${service.colors.primary} 0%, 
+                    ${service.colors.secondary} 100%
+                  )
+                `,
+              }}
             />
           )}
 
-          {/* Color gradient overlay - reduced opacity */}
-          <div 
-            className="absolute inset-0"
-            style={{
-              background: `
-                linear-gradient(135deg, 
-                  ${service.colors.primary}50 0%, 
-                  ${service.colors.secondary}30 50%,
-                  transparent 100%
-                )
-              `,
-              mixBlendMode: 'multiply',
-            }}
-          />
+          {/* Loading state - show poster */}
+          {!isLoaded && !hasError && (
+            <div 
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ 
+                backgroundImage: `url(${service.posterUrl})`,
+                filter: 'brightness(0.85)',
+              }}
+            />
+          )}
 
-          {/* Secondary gradient for depth - reduced opacity */}
+          {/* Minimal left side gradient for text readability only */}
           <div 
             className="absolute inset-0"
             style={{
               background: `
                 linear-gradient(to right, 
-                  hsl(var(--background)) 0%,
-                  hsl(var(--background) / 0.5) 25%,
-                  transparent 50%
+                  hsl(var(--background) / 0.7) 0%,
+                  hsl(var(--background) / 0.3) 30%,
+                  transparent 60%
                 )
               `,
             }}
           />
 
-          {/* Top gradient fade */}
+          {/* Top gradient fade - very subtle */}
           <div 
-            className="absolute inset-x-0 top-0 h-40"
+            className="absolute inset-x-0 top-0 h-24"
             style={{
-              background: 'linear-gradient(to bottom, hsl(var(--background)), transparent)',
+              background: 'linear-gradient(to bottom, hsl(var(--background) / 0.5), transparent)',
             }}
           />
 
           {/* Bottom gradient fade */}
           <div 
-            className="absolute inset-x-0 bottom-0 h-60"
+            className="absolute inset-x-0 bottom-0 h-40"
             style={{
               background: 'linear-gradient(to top, hsl(var(--background)), transparent)',
             }}
           />
 
-          {/* Vignette effect */}
-          <div 
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: 'radial-gradient(ellipse at center, transparent 40%, hsl(var(--background) / 0.6) 100%)',
-            }}
-          />
-
-          {/* Noise texture overlay */}
-          <div className="absolute inset-0 noise-overlay opacity-30 pointer-events-none" />
+          {/* Noise texture overlay - subtle */}
+          <div className="absolute inset-0 noise-overlay opacity-20 pointer-events-none" />
         </motion.div>
       )}
     </AnimatePresence>
