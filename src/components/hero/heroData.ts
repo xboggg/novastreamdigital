@@ -83,9 +83,9 @@ export const heroServices: HeroService[] = [
     title: 'Ongoing Digital Care',
     tagline: 'Continuous Growth & Support',
     description: 'Dedicated partnership to maintain, optimize, and evolve your digital presence as your business grows.',
-    // African tech/design professionals - Pexels
-    videoUrl: 'https://videos.pexels.com/video-files/7688124/7688124-uhd_2560_1440_25fps.mp4',
-    posterUrl: 'https://images.pexels.com/videos/7688124/pexels-photo-7688124.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    // Black African professionals working on tech/design - Pexels
+    videoUrl: 'https://videos.pexels.com/video-files/5699295/5699295-uhd_2560_1440_25fps.mp4',
+    posterUrl: 'https://images.pexels.com/videos/5699295/pexels-photo-5699295.jpeg?auto=compress&cs=tinysrgb&w=1920',
     colors: {
       primary: 'hsl(160, 84%, 39%)',
       secondary: 'hsl(172, 66%, 50%)',
