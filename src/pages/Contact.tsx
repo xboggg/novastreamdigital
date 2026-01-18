@@ -1,11 +1,14 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, ArrowLeft, Check, Send } from 'lucide-react';
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+
+const HCAPTCHA_SITE_KEY = import.meta.env.VITE_HCAPTCHA_SITE_KEY || '10000000-ffff-ffff-ffff-000000000001'; // Test key as fallback
 
 const serviceOptions = [
   { id: 'website', label: 'Website Design', icon: '🌐' },
@@ -43,6 +46,8 @@ const Contact = () => {
   });
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaRef = useRef<HCaptcha>(null);
   const { toast } = useToast();
 
   const toggleService = (id: string) => {
@@ -56,8 +61,25 @@ const Contact = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!captchaToken) {
+      toast({ variant: 'destructive', title: 'Verification Required', description: 'Please complete the captcha verification.' });
+      return;
+    }
+
+    // Rate limiting: max 3 submissions per hour
+    const rateLimitKey = 'novastream_contact_submissions';
+    const submissions = JSON.parse(localStorage.getItem(rateLimitKey) || '[]') as number[];
+    const oneHourAgo = Date.now() - 60 * 60 * 1000;
+    const recentSubmissions = submissions.filter(time => time > oneHourAgo);
+
+    if (recentSubmissions.length >= 3) {
+      toast({ variant: 'destructive', title: 'Rate Limit', description: 'Too many submissions. Please try again later.' });
+      return;
+    }
+
     setIsSubmitting(true);
-    
+
     const leadData = {
       name: formData.name,
       email: formData.email,
@@ -74,7 +96,13 @@ const Contact = () => {
     if (error) {
       toast({ variant: 'destructive', title: 'Error', description: 'Failed to submit. Please try again.' });
       setIsSubmitting(false);
+      captchaRef.current?.resetCaptcha();
+      setCaptchaToken(null);
     } else {
+      // Record successful submission for rate limiting
+      recentSubmissions.push(Date.now());
+      localStorage.setItem(rateLimitKey, JSON.stringify(recentSubmissions));
+
       // Send email notification (fire and forget)
       try {
         await supabase.functions.invoke('notify-new-lead', {
@@ -91,7 +119,7 @@ const Contact = () => {
   const canProceed = () => {
     if (step === 1) return formData.services.length > 0;
     if (step === 2) return formData.description && formData.timeline && formData.budget;
-    return formData.name && formData.email;
+    return formData.name && formData.email && captchaToken;
   };
 
   if (submitted) {
@@ -323,6 +351,16 @@ const Contact = () => {
                       onChange={(e) => setFormData(prev => ({ ...prev, referral: e.target.value }))}
                       placeholder="Google, Referral, Social Media..."
                       className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                    />
+                  </div>
+
+                  <div className="mt-6">
+                    <HCaptcha
+                      ref={captchaRef}
+                      sitekey={HCAPTCHA_SITE_KEY}
+                      onVerify={(token) => setCaptchaToken(token)}
+                      onExpire={() => setCaptchaToken(null)}
+                      onError={() => setCaptchaToken(null)}
                     />
                   </div>
                 </motion.div>

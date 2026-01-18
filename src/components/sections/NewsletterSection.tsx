@@ -13,12 +13,27 @@ export const NewsletterSection = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email || !email.includes('@')) {
       toast({
         variant: 'destructive',
         title: 'Invalid email',
         description: 'Please enter a valid email address.',
+      });
+      return;
+    }
+
+    // Rate limiting: max 5 attempts per hour
+    const rateLimitKey = 'novastream_newsletter_submissions';
+    const submissions = JSON.parse(localStorage.getItem(rateLimitKey) || '[]') as number[];
+    const oneHourAgo = Date.now() - 60 * 60 * 1000;
+    const recentSubmissions = submissions.filter(time => time > oneHourAgo);
+
+    if (recentSubmissions.length >= 5) {
+      toast({
+        variant: 'destructive',
+        title: 'Too many attempts',
+        description: 'Please try again later.',
       });
       return;
     }
@@ -41,6 +56,10 @@ export const NewsletterSection = () => {
           throw error;
         }
       } else {
+        // Record successful submission for rate limiting
+        recentSubmissions.push(Date.now());
+        localStorage.setItem(rateLimitKey, JSON.stringify(recentSubmissions));
+
         setIsSubscribed(true);
         toast({
           title: 'Successfully subscribed!',
