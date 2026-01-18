@@ -15,6 +15,7 @@ import { JsonLd, createArticleSchema, createBreadcrumbSchema } from "@/component
 import { SocialShare } from "@/components/SocialShare";
 import { ReadingProgress } from "@/components/ReadingProgress";
 import { RelatedPosts } from "@/components/RelatedPosts";
+import { OptimizedImage } from "@/components/OptimizedImage";
 
 const PostDetail = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -166,13 +167,13 @@ const PostDetail = () => {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="mb-12"
             >
-              <div className="aspect-video rounded-xl overflow-hidden bg-muted">
-                <img
-                  src={post.featured_image}
-                  alt={post.title}
-                  className="w-full h-full object-cover"
-                />
-              </div>
+              <OptimizedImage
+                src={post.featured_image}
+                alt={post.title}
+                aspectRatio="video"
+                containerClassName="rounded-xl"
+                priority
+              />
             </motion.div>
           )}
 

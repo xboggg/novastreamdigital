@@ -12,6 +12,7 @@ import { Footer } from "@/components/layout/Footer";
 import { SEO } from "@/components/SEO";
 import { JsonLd, createBreadcrumbSchema } from "@/components/JsonLd";
 import { SocialShare } from "@/components/SocialShare";
+import { OptimizedImage } from "@/components/OptimizedImage";
 
 const ProjectDetail = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -146,13 +147,13 @@ const ProjectDetail = () => {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="mb-12"
             >
-              <div className="aspect-video rounded-xl overflow-hidden bg-muted">
-                <img
-                  src={project.image_url}
-                  alt={project.title}
-                  className="w-full h-full object-cover"
-                />
-              </div>
+              <OptimizedImage
+                src={project.image_url}
+                alt={project.title}
+                aspectRatio="video"
+                containerClassName="rounded-xl"
+                priority
+              />
             </motion.div>
           )}
 

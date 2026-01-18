@@ -3,6 +3,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { OptimizedImage } from '@/components/OptimizedImage';
 
 const projects = [
   {
@@ -85,10 +86,11 @@ export const FeaturedWorkSection = () => {
             <Link to={`/portfolio/${project.id}`}>
               <div className="relative rounded-2xl overflow-hidden aspect-[4/3]">
                 {/* Image */}
-                <img
+                <OptimizedImage
                   src={project.image}
                   alt={project.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="transition-transform duration-700 group-hover:scale-105"
+                  priority={index < 2}
                 />
                 
                 {/* Overlay gradient */}

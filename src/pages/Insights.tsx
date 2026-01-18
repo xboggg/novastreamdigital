@@ -9,6 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import { SEO } from '@/components/SEO';
 import { JsonLd, createBreadcrumbSchema } from '@/components/JsonLd';
+import { OptimizedImage } from '@/components/OptimizedImage';
 
 interface Post {
   id: string;
@@ -113,13 +114,14 @@ const Insights = () => {
                 >
                   <Link to={`/insights/${post.slug || post.id}`} className="group block">
                     <div className="relative rounded-2xl overflow-hidden aspect-[3/2] mb-6">
-                      <img
+                      <OptimizedImage
                         src={post.featured_image || 'https://images.unsplash.com/photo-1558655146-d09347e92766?w=600&h=400&fit=crop'}
                         alt={post.title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        className="transition-transform duration-500 group-hover:scale-105"
+                        priority={index < 2}
                       />
                       {post.category && (
-                        <div className="absolute top-4 left-4">
+                        <div className="absolute top-4 left-4 z-10">
                           <span className="px-3 py-1 rounded-full bg-background/80 backdrop-blur-sm text-xs font-medium">
                             {post.category}
                           </span>

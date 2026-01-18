@@ -5,6 +5,7 @@ import { Clock, ArrowRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
+import { OptimizedImage } from '@/components/OptimizedImage';
 
 interface Post {
   id: string;
@@ -123,13 +124,13 @@ export const RelatedPosts = ({
           >
             <Link to={`/insights/${post.slug || post.id}`} className="group block">
               <div className="relative rounded-xl overflow-hidden aspect-[3/2] mb-4">
-                <img
+                <OptimizedImage
                   src={post.featured_image || 'https://images.unsplash.com/photo-1558655146-d09347e92766?w=400&h=300&fit=crop'}
                   alt={post.title}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="transition-transform duration-500 group-hover:scale-105"
                 />
                 {post.category && (
-                  <div className="absolute top-3 left-3">
+                  <div className="absolute top-3 left-3 z-10">
                     <span className="px-2 py-1 rounded-full bg-background/80 backdrop-blur-sm text-xs font-medium">
                       {post.category}
                     </span>

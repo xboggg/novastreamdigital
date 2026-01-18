@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Sun, Moon } from 'lucide-react';
+import { Menu, X, Sun, Moon, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/hooks/useTheme';
+import { SearchDialog } from '@/components/SearchDialog';
 
 const navLinks = [
   { name: 'Home', href: '/' },
@@ -17,6 +18,7 @@ const navLinks = [
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
 
@@ -31,6 +33,18 @@ export const Navbar = () => {
   useEffect(() => {
     setIsOpen(false);
   }, [location]);
+
+  // Keyboard shortcut for search (Cmd/Ctrl + K)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   return (
     <motion.header
@@ -83,6 +97,18 @@ export const Navbar = () => {
           <div className="hidden md:flex items-center gap-3">
             <Button
               variant="ghost"
+              size="sm"
+              onClick={() => setSearchOpen(true)}
+              className="rounded-full gap-2 text-muted-foreground hover:text-foreground"
+            >
+              <Search className="h-4 w-4" />
+              <span className="text-xs">Search</span>
+              <kbd className="pointer-events-none hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
+                <span className="text-xs">⌘</span>K
+              </kbd>
+            </Button>
+            <Button
+              variant="ghost"
               size="icon"
               onClick={toggleTheme}
               className="rounded-full"
@@ -118,6 +144,14 @@ export const Navbar = () => {
 
           {/* Mobile menu button */}
           <div className="flex md:hidden items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSearchOpen(true)}
+              className="rounded-full"
+            >
+              <Search className="h-5 w-5" />
+            </Button>
             <Button
               variant="ghost"
               size="icon"
@@ -181,6 +215,9 @@ export const Navbar = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Search Dialog */}
+      <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
     </motion.header>
   );
 };

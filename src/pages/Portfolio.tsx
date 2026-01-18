@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SEO } from '@/components/SEO';
 import { JsonLd, createBreadcrumbSchema } from '@/components/JsonLd';
+import { OptimizedImage } from '@/components/OptimizedImage';
 
 interface Project {
   id: string;
@@ -143,10 +144,11 @@ const Portfolio = () => {
                 >
                   <Link to={`/portfolio/${project.slug || project.id}`} className="group block">
                     <div className="relative rounded-2xl overflow-hidden aspect-[4/3]">
-                      <img
+                      <OptimizedImage
                         src={project.image_url || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=450&fit=crop'}
                         alt={project.title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        className="transition-transform duration-500 group-hover:scale-105"
+                        priority={index < 3}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
