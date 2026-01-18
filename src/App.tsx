@@ -18,7 +18,10 @@ import PostDetail from "./pages/PostDetail";
 import Contact from "./pages/Contact";
 import Pricing from "./pages/Pricing";
 import Install from "./pages/Install";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
+import { CookieConsent } from "./components/CookieConsent";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProjects from "./pages/admin/AdminProjects";
@@ -53,6 +56,8 @@ const App = () => (
               <Route path="/contact" element={<Contact />} />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/install" element={<Install />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
               <Route path="/admin/projects" element={<ProtectedRoute requireAdmin><AdminProjects /></ProtectedRoute>} />
@@ -65,6 +70,7 @@ const App = () => (
               <Route path="/admin/settings" element={<ProtectedRoute requireAdmin><AdminSettings /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <CookieConsent />
           </BrowserRouter>
         </TooltipProvider>
       </AuthProvider>
