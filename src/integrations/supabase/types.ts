@@ -12,7 +12,7 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.1"
   }
-  public: {
+  novastream: {
     Tables: {
       faqs: {
         Row: {
@@ -53,7 +53,7 @@ export type Database = {
           notes: string | null
           referral_source: string | null
           services: string[] | null
-          status: Database["public"]["Enums"]["lead_status"]
+          status: Database["novastream"]["Enums"]["lead_status"]
           timeline: string | null
         }
         Insert: {
@@ -67,7 +67,7 @@ export type Database = {
           notes?: string | null
           referral_source?: string | null
           services?: string[] | null
-          status?: Database["public"]["Enums"]["lead_status"]
+          status?: Database["novastream"]["Enums"]["lead_status"]
           timeline?: string | null
         }
         Update: {
@@ -81,7 +81,7 @@ export type Database = {
           notes?: string | null
           referral_source?: string | null
           services?: string[] | null
-          status?: Database["public"]["Enums"]["lead_status"]
+          status?: Database["novastream"]["Enums"]["lead_status"]
           timeline?: string | null
         }
         Relationships: []
@@ -121,7 +121,7 @@ export type Database = {
           published_at: string | null
           reading_time: number | null
           slug: string | null
-          status: Database["public"]["Enums"]["content_status"]
+          status: Database["novastream"]["Enums"]["content_status"]
           tags: string[] | null
           title: string
           updated_at: string
@@ -136,7 +136,7 @@ export type Database = {
           published_at?: string | null
           reading_time?: number | null
           slug?: string | null
-          status?: Database["public"]["Enums"]["content_status"]
+          status?: Database["novastream"]["Enums"]["content_status"]
           tags?: string[] | null
           title: string
           updated_at?: string
@@ -151,7 +151,7 @@ export type Database = {
           published_at?: string | null
           reading_time?: number | null
           slug?: string | null
-          status?: Database["public"]["Enums"]["content_status"]
+          status?: Database["novastream"]["Enums"]["content_status"]
           tags?: string[] | null
           title?: string
           updated_at?: string
@@ -199,7 +199,7 @@ export type Database = {
           created_at: string
           email: string | null
           id: string
-          role: Database["public"]["Enums"]["app_role"]
+          role: Database["novastream"]["Enums"]["app_role"]
           updated_at: string
           user_id: string
         }
@@ -207,7 +207,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           id?: string
-          role?: Database["public"]["Enums"]["app_role"]
+          role?: Database["novastream"]["Enums"]["app_role"]
           updated_at?: string
           user_id: string
         }
@@ -215,7 +215,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           id?: string
-          role?: Database["public"]["Enums"]["app_role"]
+          role?: Database["novastream"]["Enums"]["app_role"]
           updated_at?: string
           user_id?: string
         }
@@ -232,7 +232,7 @@ export type Database = {
           id: string
           image_url: string | null
           slug: string | null
-          status: Database["public"]["Enums"]["content_status"]
+          status: Database["novastream"]["Enums"]["content_status"]
           tags: string[] | null
           title: string
           updated_at: string
@@ -248,7 +248,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           slug?: string | null
-          status?: Database["public"]["Enums"]["content_status"]
+          status?: Database["novastream"]["Enums"]["content_status"]
           tags?: string[] | null
           title: string
           updated_at?: string
@@ -264,7 +264,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           slug?: string | null
-          status?: Database["public"]["Enums"]["content_status"]
+          status?: Database["novastream"]["Enums"]["content_status"]
           tags?: string[] | null
           title?: string
           updated_at?: string
@@ -281,7 +281,7 @@ export type Database = {
           id: string
           is_featured: boolean | null
           platform: string
-          status: Database["public"]["Enums"]["content_status"]
+          status: Database["novastream"]["Enums"]["content_status"]
           thumbnail_url: string | null
           title: string | null
           updated_at: string
@@ -296,7 +296,7 @@ export type Database = {
           id?: string
           is_featured?: boolean | null
           platform: string
-          status?: Database["public"]["Enums"]["content_status"]
+          status?: Database["novastream"]["Enums"]["content_status"]
           thumbnail_url?: string | null
           title?: string | null
           updated_at?: string
@@ -311,7 +311,7 @@ export type Database = {
           id?: string
           is_featured?: boolean | null
           platform?: string
-          status?: Database["public"]["Enums"]["content_status"]
+          status?: Database["novastream"]["Enums"]["content_status"]
           thumbnail_url?: string | null
           title?: string | null
           updated_at?: string
@@ -332,7 +332,7 @@ export type Database = {
           id: string
           rating: number | null
           role: string | null
-          status: Database["public"]["Enums"]["content_status"]
+          status: Database["novastream"]["Enums"]["content_status"]
         }
         Insert: {
           avatar_url?: string | null
@@ -345,7 +345,7 @@ export type Database = {
           id?: string
           rating?: number | null
           role?: string | null
-          status?: Database["public"]["Enums"]["content_status"]
+          status?: Database["novastream"]["Enums"]["content_status"]
         }
         Update: {
           avatar_url?: string | null
@@ -358,7 +358,7 @@ export type Database = {
           id?: string
           rating?: number | null
           role?: string | null
-          status?: Database["public"]["Enums"]["content_status"]
+          status?: Database["novastream"]["Enums"]["content_status"]
         }
         Relationships: []
       }
@@ -372,7 +372,7 @@ export type Database = {
           id: string | null
           is_featured: boolean | null
           platform: string | null
-          status: Database["public"]["Enums"]["content_status"] | null
+          status: Database["novastream"]["Enums"]["content_status"] | null
           thumbnail_url: string | null
           title: string | null
           updated_at: string | null
@@ -385,7 +385,7 @@ export type Database = {
           id?: string | null
           is_featured?: boolean | null
           platform?: string | null
-          status?: Database["public"]["Enums"]["content_status"] | null
+          status?: Database["novastream"]["Enums"]["content_status"] | null
           thumbnail_url?: string | null
           title?: string | null
           updated_at?: string | null
@@ -398,7 +398,7 @@ export type Database = {
           id?: string | null
           is_featured?: boolean | null
           platform?: string | null
-          status?: Database["public"]["Enums"]["content_status"] | null
+          status?: Database["novastream"]["Enums"]["content_status"] | null
           thumbnail_url?: string | null
           title?: string | null
           updated_at?: string | null
@@ -431,7 +431,7 @@ export type Database = {
 
 type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "novastream">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
@@ -547,7 +547,7 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  public: {
+  novastream: {
     Enums: {
       app_role: ["admin", "user"],
       content_status: ["draft", "published"],
