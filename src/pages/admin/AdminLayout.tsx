@@ -13,6 +13,9 @@ import {
   Menu,
   X,
   Video,
+  DollarSign,
+  HelpCircle,
+  UserCog,
 } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
@@ -28,8 +31,11 @@ const navItems = [
   { icon: FileText, label: 'Blog Posts', path: '/admin/posts' },
   { icon: Video, label: 'Social Media', path: '/admin/social' },
   { icon: MessageSquare, label: 'Testimonials', path: '/admin/testimonials' },
+  { icon: DollarSign, label: 'Pricing', path: '/admin/pricing' },
+  { icon: HelpCircle, label: 'FAQs', path: '/admin/faqs' },
   { icon: Users, label: 'Leads', path: '/admin/leads' },
   { icon: Mail, label: 'Newsletter', path: '/admin/newsletter' },
+  { icon: UserCog, label: 'Users', path: '/admin/users' },
   { icon: Settings, label: 'Settings', path: '/admin/settings' },
 ];
 

@@ -32,6 +32,9 @@ import AdminTestimonials from "./pages/admin/AdminTestimonials";
 import AdminLeads from "./pages/admin/AdminLeads";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminNewsletter from "./pages/admin/AdminNewsletter";
+import AdminPricing from "./pages/admin/AdminPricing";
+import AdminFAQ from "./pages/admin/AdminFAQ";
+import AdminUsers from "./pages/admin/AdminUsers";
 
 const queryClient = new QueryClient();
 
@@ -67,6 +70,9 @@ const App = () => (
               <Route path="/admin/testimonials" element={<ProtectedRoute requireAdmin><AdminTestimonials /></ProtectedRoute>} />
               <Route path="/admin/leads" element={<ProtectedRoute requireAdmin><AdminLeads /></ProtectedRoute>} />
               <Route path="/admin/newsletter" element={<ProtectedRoute requireAdmin><AdminNewsletter /></ProtectedRoute>} />
+              <Route path="/admin/pricing" element={<ProtectedRoute requireAdmin><AdminPricing /></ProtectedRoute>} />
+              <Route path="/admin/faqs" element={<ProtectedRoute requireAdmin><AdminFAQ /></ProtectedRoute>} />
+              <Route path="/admin/users" element={<ProtectedRoute requireAdmin><AdminUsers /></ProtectedRoute>} />
               <Route path="/admin/settings" element={<ProtectedRoute requireAdmin><AdminSettings /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
