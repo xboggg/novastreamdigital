@@ -16,5 +16,11 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
   },
   db: {
     schema: 'novastream'
+  },
+  global: {
+    headers: {
+      'Accept-Profile': 'novastream',
+      'Content-Profile': 'novastream'
+    }
   }
 });
