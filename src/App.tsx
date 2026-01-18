@@ -11,6 +11,7 @@ import { InstallPromptBanner } from "@/components/pwa/InstallPromptBanner";
 import { NotificationPrompt } from "@/components/pwa/NotificationPrompt";
 import { CookieConsent } from "./components/CookieConsent";
 import { PageLoader } from "@/components/PageLoader";
+import { ScrollToTop } from "@/components/ScrollToTop";
 
 // Eagerly load the index page for better initial load
 import Index from "./pages/Index";
@@ -54,6 +55,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <ScrollToTop />
             <InstallPromptBanner />
             <NotificationPrompt />
             <Suspense fallback={<PageLoader />}>
