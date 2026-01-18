@@ -12,6 +12,9 @@ import { Footer } from "@/components/layout/Footer";
 import DOMPurify from "dompurify";
 import { SEO } from "@/components/SEO";
 import { JsonLd, createArticleSchema, createBreadcrumbSchema } from "@/components/JsonLd";
+import { SocialShare } from "@/components/SocialShare";
+import { ReadingProgress } from "@/components/ReadingProgress";
+import { RelatedPosts } from "@/components/RelatedPosts";
 
 const PostDetail = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -89,6 +92,7 @@ const PostDetail = () => {
 
   return (
     <PageTransition>
+      <ReadingProgress />
       <SEO
         title={post.title}
         description={post.excerpt || `Read ${post.title} on NovaStream Digital Insights`}
@@ -200,25 +204,46 @@ const PostDetail = () => {
             )}
           </motion.div>
 
-          {/* Tags */}
-          {post.tags && post.tags.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              className="mt-12 pt-8 border-t"
-            >
-              <h3 className="text-sm font-medium mb-4">Tags</h3>
-              <div className="flex flex-wrap gap-2">
-                {post.tags.map((tag: string) => (
-                  <Badge key={tag} variant="outline">
-                    <Tag className="mr-1 h-3 w-3" />
-                    {tag}
-                  </Badge>
-                ))}
+          {/* Tags and Share */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="mt-12 pt-8 border-t"
+          >
+            <div className="flex flex-wrap items-start justify-between gap-6">
+              {/* Tags */}
+              {post.tags && post.tags.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-medium mb-4">Tags</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {post.tags.map((tag: string) => (
+                      <Badge key={tag} variant="outline">
+                        <Tag className="mr-1 h-3 w-3" />
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Social Share */}
+              <div>
+                <SocialShare
+                  title={post.title}
+                  url={`/insights/${slug}`}
+                  description={post.excerpt}
+                />
               </div>
-            </motion.div>
-          )}
+            </div>
+          </motion.div>
+
+          {/* Related Posts */}
+          <RelatedPosts
+            currentPostId={post.id}
+            category={post.category}
+            tags={post.tags}
+          />
         </article>
       </main>
       <Footer />

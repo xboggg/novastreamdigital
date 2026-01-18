@@ -11,6 +11,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { SEO } from "@/components/SEO";
 import { JsonLd, createBreadcrumbSchema } from "@/components/JsonLd";
+import { SocialShare } from "@/components/SocialShare";
 
 const ProjectDetail = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -201,23 +202,30 @@ const ProjectDetail = () => {
             )}
           </motion.div>
 
-          {/* Meta */}
+          {/* Meta and Share */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
             className="mt-12 pt-8 border-t"
           >
-            <div className="flex items-center text-sm text-muted-foreground">
-              <Calendar className="mr-2 h-4 w-4" />
-              <span>
-                Published on{" "}
-                {new Date(project.created_at).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </span>
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center text-sm text-muted-foreground">
+                <Calendar className="mr-2 h-4 w-4" />
+                <span>
+                  Published on{" "}
+                  {new Date(project.created_at).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </span>
+              </div>
+              <SocialShare
+                title={project.title}
+                url={`/portfolio/${slug}`}
+                description={project.description}
+              />
             </div>
           </motion.div>
         </article>
