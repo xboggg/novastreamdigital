@@ -6,6 +6,8 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
+import { SEO } from '@/components/SEO';
+import { JsonLd, createBreadcrumbSchema } from '@/components/JsonLd';
 
 interface Project {
   id: string;
@@ -22,6 +24,11 @@ const Portfolio = () => {
   const [categories, setCategories] = useState<string[]>(['All']);
   const [activeCategory, setActiveCategory] = useState('All');
   const [isLoading, setIsLoading] = useState(true);
+
+  const breadcrumbs = createBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Portfolio', url: '/portfolio' },
+  ]);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -49,8 +56,14 @@ const Portfolio = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Portfolio"
+        description="Explore our featured projects - a curated selection of our finest web design, development, and branding work across industries."
+        keywords="web design portfolio, web development projects, case studies, Ghana digital agency"
+      />
+      <JsonLd type="breadcrumb" data={breadcrumbs} />
       <Navbar />
-      
+
       <main className="pt-32 pb-20">
         {/* Header */}
         <section className="container-custom mb-12">

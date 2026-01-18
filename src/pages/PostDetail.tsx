@@ -10,6 +10,8 @@ import { PageTransition } from "@/components/layout/PageTransition";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import DOMPurify from "dompurify";
+import { SEO } from "@/components/SEO";
+import { JsonLd, createArticleSchema, createBreadcrumbSchema } from "@/components/JsonLd";
 
 const PostDetail = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -70,8 +72,33 @@ const PostDetail = () => {
     );
   }
 
+  const breadcrumbs = createBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Insights', url: '/insights' },
+    { name: post.title, url: `/insights/${slug}` },
+  ]);
+
+  const articleSchema = createArticleSchema({
+    title: post.title,
+    description: post.excerpt || post.title,
+    slug: slug || post.id,
+    image: post.featured_image,
+    publishedAt: post.published_at || post.created_at,
+    modifiedAt: post.updated_at || post.published_at,
+  });
+
   return (
     <PageTransition>
+      <SEO
+        title={post.title}
+        description={post.excerpt || `Read ${post.title} on NovaStream Digital Insights`}
+        image={post.featured_image}
+        type="article"
+        publishedTime={post.published_at || post.created_at}
+        modifiedTime={post.updated_at}
+      />
+      <JsonLd type="breadcrumb" data={breadcrumbs} />
+      <JsonLd type="article" data={articleSchema} />
       <Navbar />
       <main className="min-h-screen pt-24 pb-16">
         <article className="container max-w-3xl mx-auto px-4">

@@ -7,6 +7,8 @@ import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { SEO } from '@/components/SEO';
+import { JsonLd, createBreadcrumbSchema } from '@/components/JsonLd';
 
 const HCAPTCHA_SITE_KEY = import.meta.env.VITE_HCAPTCHA_SITE_KEY || '10000000-ffff-ffff-ffff-000000000001'; // Test key as fallback
 
@@ -33,6 +35,11 @@ const timelineOptions = [
 ];
 
 const Contact = () => {
+  const breadcrumbs = createBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Contact', url: '/contact' },
+  ]);
+
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     services: [] as string[],
@@ -155,8 +162,14 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Contact Us"
+        description="Start a project with NovaStream Digital. Tell us about your vision and we'll get back to you within 24-48 hours."
+        keywords="contact NovaStream Digital, start a project, web design inquiry, get a quote Ghana"
+      />
+      <JsonLd type="breadcrumb" data={breadcrumbs} />
       <Navbar />
-      
+
       <main className="pt-32 pb-20">
         <div className="container-custom">
           {/* Header */}

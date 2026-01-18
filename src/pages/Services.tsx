@@ -4,6 +4,8 @@ import { ArrowRight, Globe, Layers, Palette, HeartHandshake, Check } from 'lucid
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
+import { SEO } from '@/components/SEO';
+import { JsonLd, createBreadcrumbSchema } from '@/components/JsonLd';
 
 const services = [
   {
@@ -65,10 +67,21 @@ const services = [
 ];
 
 const Services = () => {
+  const breadcrumbs = createBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Services', url: '/services' },
+  ]);
+
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Our Services"
+        description="Comprehensive digital solutions including website design, web applications, brand identity, and ongoing support. Everything you need to thrive online."
+        keywords="web design services, web development, web applications, brand identity, digital support, Ghana"
+      />
+      <JsonLd type="breadcrumb" data={breadcrumbs} />
       <Navbar />
-      
+
       <main className="pt-32 pb-20">
         {/* Header */}
         <section className="container-custom mb-20">

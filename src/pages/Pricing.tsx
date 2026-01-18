@@ -7,6 +7,8 @@ import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { supabase } from '@/integrations/supabase/client';
+import { SEO } from '@/components/SEO';
+import { JsonLd, createBreadcrumbSchema, createFAQSchema } from '@/components/JsonLd';
 
 interface PricingPackage {
   id: string;
@@ -31,6 +33,11 @@ const Pricing = () => {
   const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const breadcrumbs = createBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Pricing', url: '/pricing' },
+  ]);
+
   useEffect(() => {
     const fetchData = async () => {
       const [packagesRes, faqsRes] = await Promise.all([
@@ -44,10 +51,19 @@ const Pricing = () => {
     fetchData();
   }, []);
 
+  const faqSchema = faqs.length > 0 ? createFAQSchema(faqs) : null;
+
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Pricing"
+        description="Transparent pricing for exceptional digital experiences. Web design, development, and brand identity packages starting from affordable rates."
+        keywords="web design pricing, web development cost, digital agency rates, Ghana web design prices"
+      />
+      <JsonLd type="breadcrumb" data={breadcrumbs} />
+      {faqSchema && <JsonLd type="faq" data={faqSchema} />}
       <Navbar />
-      
+
       <main className="pt-32 pb-20">
         {/* Header */}
         <section className="container-custom mb-16">

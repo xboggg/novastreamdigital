@@ -1,10 +1,23 @@
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { motion } from 'framer-motion';
+import { SEO } from '@/components/SEO';
+import { JsonLd, createBreadcrumbSchema } from '@/components/JsonLd';
 
 const Terms = () => {
+  const breadcrumbs = createBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Terms of Service', url: '/terms' },
+  ]);
+
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Terms of Service"
+        description="Terms of Service for NovaStream Digital - web design, development, and digital solutions. Read our terms and conditions."
+        noindex={false}
+      />
+      <JsonLd type="breadcrumb" data={breadcrumbs} />
       <Navbar />
 
       <main className="pt-32 pb-20">

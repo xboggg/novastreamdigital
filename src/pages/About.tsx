@@ -4,12 +4,25 @@ import { ArrowRight } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
+import { SEO } from '@/components/SEO';
+import { JsonLd, createBreadcrumbSchema } from '@/components/JsonLd';
 
 const About = () => {
+  const breadcrumbs = createBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'About', url: '/about' },
+  ]);
+
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="About Us"
+        description="Learn about NovaStream Digital - a creative studio dedicated to designing and building exceptional digital experiences for forward-thinking businesses."
+        keywords="about NovaStream Digital, digital agency Ghana, web design studio, our story"
+      />
+      <JsonLd type="breadcrumb" data={breadcrumbs} />
       <Navbar />
-      
+
       <main className="pt-32 pb-20">
         {/* Header */}
         <section className="container-custom mb-20">

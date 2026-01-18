@@ -9,6 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { PageTransition } from "@/components/layout/PageTransition";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { SEO } from "@/components/SEO";
+import { JsonLd, createBreadcrumbSchema } from "@/components/JsonLd";
 
 const ProjectDetail = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -69,8 +71,21 @@ const ProjectDetail = () => {
     );
   }
 
+  const breadcrumbs = createBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Portfolio', url: '/portfolio' },
+    { name: project.title, url: `/portfolio/${slug}` },
+  ]);
+
   return (
     <PageTransition>
+      <SEO
+        title={project.title}
+        description={project.description || `View ${project.title} - a project by NovaStream Digital`}
+        image={project.image_url}
+        keywords={`${project.category}, web design project, ${project.tags?.join(', ') || ''}`}
+      />
+      <JsonLd type="breadcrumb" data={breadcrumbs} />
       <Navbar />
       <main className="min-h-screen pt-24 pb-16">
         <article className="container max-w-4xl mx-auto px-4">

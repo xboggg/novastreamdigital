@@ -1,10 +1,23 @@
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { motion } from 'framer-motion';
+import { SEO } from '@/components/SEO';
+import { JsonLd, createBreadcrumbSchema } from '@/components/JsonLd';
 
 const Privacy = () => {
+  const breadcrumbs = createBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Privacy Policy', url: '/privacy' },
+  ]);
+
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Privacy Policy"
+        description="NovaStream Digital's privacy policy explains how we collect, use, disclose, and safeguard your information when you visit our website."
+        noindex={false}
+      />
+      <JsonLd type="breadcrumb" data={breadcrumbs} />
       <Navbar />
 
       <main className="pt-32 pb-20">

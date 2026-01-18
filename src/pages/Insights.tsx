@@ -7,6 +7,8 @@ import { Footer } from '@/components/layout/Footer';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
+import { SEO } from '@/components/SEO';
+import { JsonLd, createBreadcrumbSchema } from '@/components/JsonLd';
 
 interface Post {
   id: string;
@@ -23,6 +25,11 @@ interface Post {
 const Insights = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const breadcrumbs = createBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Insights', url: '/insights' },
+  ]);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -43,8 +50,14 @@ const Insights = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Insights"
+        description="Thoughts on design, technology, and craft. Ideas, perspectives, and lessons from our work in the digital space."
+        keywords="web design blog, digital insights, technology articles, design tips, Ghana tech blog"
+      />
+      <JsonLd type="breadcrumb" data={breadcrumbs} />
       <Navbar />
-      
+
       <main className="pt-32 pb-20">
         {/* Header */}
         <section className="container-custom mb-16">
