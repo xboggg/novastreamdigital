@@ -12,6 +12,7 @@ import { NotificationPrompt } from "@/components/pwa/NotificationPrompt";
 import { CookieConsent } from "./components/CookieConsent";
 import { PageLoader } from "@/components/PageLoader";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 
 // Eagerly load the index page for better initial load
 import Index from "./pages/Index";
@@ -89,6 +90,7 @@ const App = () => (
               </Routes>
             </Suspense>
             <CookieConsent />
+            <WhatsAppButton />
           </BrowserRouter>
         </TooltipProvider>
       </AuthProvider>

@@ -1,12 +1,12 @@
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { HeroSection } from '@/components/sections/HeroSection';
+import { ClientLogosSection } from '@/components/sections/ClientLogosSection';
 import { ServicesSection } from '@/components/sections/ServicesSection';
+import { StatsSection } from '@/components/sections/StatsSection';
 import { FeaturedWorkSection } from '@/components/sections/FeaturedWorkSection';
 import { PhilosophySection } from '@/components/sections/PhilosophySection';
-import { SocialFeedSection } from '@/components/sections/SocialFeedSection';
 import { TestimonialsSection } from '@/components/sections/TestimonialsSection';
-import { NewsletterSection } from '@/components/sections/NewsletterSection';
 import { CTASection } from '@/components/sections/CTASection';
 import { SEO } from '@/components/SEO';
 import { JsonLd } from '@/components/JsonLd';
@@ -15,9 +15,9 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEO
-        title="Designing Digital Experiences That Flow"
-        description="NovaStream Digital crafts refined websites and web applications for modern businesses. From captivating designs to powerful platforms."
-        keywords="web design, web development, digital agency, Ghana, web applications, UI/UX design, brand identity"
+        title="Web Design & Custom Applications in Ghana"
+        description="NovaStream Digital builds stunning websites and powerful web applications for businesses, NGOs, and government institutions in Ghana. From booking systems to management platforms."
+        keywords="web design Ghana, web development Accra, custom web applications, booking systems, government websites, NGO websites, digital agency Ghana"
       />
       <JsonLd type="organization" />
       <JsonLd type="website" />
@@ -25,12 +25,12 @@ const Index = () => {
       <Navbar />
       <main>
         <HeroSection />
+        <ClientLogosSection />
         <ServicesSection />
+        <StatsSection />
         <FeaturedWorkSection />
         <PhilosophySection />
-        <SocialFeedSection />
         <TestimonialsSection />
-        <NewsletterSection />
         <CTASection />
       </main>
       <Footer />

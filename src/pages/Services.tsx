@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Globe, Layers, Palette, HeartHandshake, Check } from 'lucide-react';
+import { ArrowRight, Globe, Layers, Palette, HeartHandshake, Check, Sparkles } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
@@ -9,13 +9,32 @@ import { JsonLd, createBreadcrumbSchema } from '@/components/JsonLd';
 
 const services = [
   {
+    id: 'applications',
+    icon: Layers,
+    title: 'Custom Web Applications',
+    description: 'Enterprise-grade applications built for real-world demands. From government booking systems to business management platforms, we build solutions that scale.',
+    color: 'from-violet-500 to-purple-400',
+    highlighted: true,
+    features: [
+      'Booking & Reservation Systems',
+      'Staff & Resource Management Platforms',
+      'Transport & Fleet Management Systems',
+      'Attendance & HR Systems',
+      'Custom Dashboards & Admin Panels',
+      'Client Portals & Intranets',
+      'SaaS Product Development',
+    ],
+  },
+  {
     id: 'websites',
     icon: Globe,
     title: 'Website Design & Development',
-    description: 'Captivating websites that tell your story and convert visitors into loyal customers.',
+    description: 'Captivating websites that tell your story and convert visitors into loyal customers. Mobile-responsive, fast, and built for results.',
     color: 'from-blue-500 to-cyan-400',
+    highlighted: false,
     features: [
       'Business & Corporate Websites',
+      'NGO & Non-Profit Websites',
       'Portfolio & Personal Brands',
       'E-commerce Experiences',
       'Landing Pages & Campaigns',
@@ -23,45 +42,35 @@ const services = [
     ],
   },
   {
-    id: 'applications',
-    icon: Layers,
-    title: 'Web Applications & Platforms',
-    description: 'Powerful custom solutions that streamline operations and delight users.',
-    color: 'from-violet-500 to-purple-400',
-    features: [
-      'Booking & Reservation Systems',
-      'Custom Dashboards & Admin Panels',
-      'Client Portals & Intranets',
-      'Internal Business Tools',
-      'SaaS Product Development',
-    ],
-  },
-  {
     id: 'design',
     icon: Palette,
     title: 'Visual Identity & Design',
-    description: 'Memorable brand identities that communicate your values and resonate with your audience.',
+    description: 'Memorable brand identities that communicate your values and resonate with your audience. From logos to complete brand systems.',
     color: 'from-pink-500 to-rose-400',
+    highlighted: false,
     features: [
+      'Logo Design & Brand Guidelines',
       'Brand Identity Systems',
-      'Logo Design & Guidelines',
       'Marketing & Campaign Materials',
       'Social Media Visual Assets',
       'Presentation Design',
+      'Print Design (Letterheads, Posters, Flyers)',
     ],
   },
   {
     id: 'support',
     icon: HeartHandshake,
     title: 'Ongoing Digital Care',
-    description: 'Continuous support and optimization to keep your digital presence thriving.',
+    description: 'Continuous support and optimization to keep your digital presence thriving. We become an extension of your team.',
     color: 'from-emerald-500 to-teal-400',
+    highlighted: false,
     features: [
       'Website Maintenance & Updates',
       'Performance Optimization',
-      'Security Monitoring',
+      'Security Monitoring & Updates',
       'Content Management',
       'Technical Support & Consulting',
+      'Training & Documentation',
     ],
   },
 ];
@@ -76,8 +85,8 @@ const Services = () => {
     <div className="min-h-screen bg-background">
       <SEO
         title="Our Services"
-        description="Comprehensive digital solutions including website design, web applications, brand identity, and ongoing support. Everything you need to thrive online."
-        keywords="web design services, web development, web applications, brand identity, digital support, Ghana"
+        description="Custom web applications, website design, and branding services in Ghana. From booking systems to business management platforms, we build solutions that scale."
+        keywords="custom web applications Ghana, booking systems, management platforms, web design Accra, website development, brand identity, digital agency Ghana"
       />
       <JsonLd type="breadcrumb" data={breadcrumbs} />
       <Navbar />
@@ -121,6 +130,14 @@ const Services = () => {
                 }`}
               >
                 <div className={index % 2 === 1 ? 'md:order-2' : ''}>
+                  {/* Highlighted badge */}
+                  {service.highlighted && (
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-4">
+                      <Sparkles className="w-3.5 h-3.5" />
+                      Our Specialty
+                    </div>
+                  )}
+
                   {/* Icon */}
                   <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-br ${service.color} mb-6`}>
                     <service.icon className="w-8 h-8 text-white" />

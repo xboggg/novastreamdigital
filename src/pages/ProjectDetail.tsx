@@ -179,23 +179,13 @@ const ProjectDetail = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="prose prose-lg dark:prose-invert max-w-none"
+            className="prose prose-lg dark:prose-invert max-w-none prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground"
           >
             {project.content ? (
-              <div className="space-y-6">
-                {project.content.split('\n').map((line: string, index: number) => {
-                  if (line.startsWith('## ')) {
-                    return <h2 key={index} className="text-2xl font-bold mt-8 mb-4">{line.replace('## ', '')}</h2>;
-                  } else if (line.startsWith('### ')) {
-                    return <h3 key={index} className="text-xl font-semibold mt-6 mb-3 text-primary">{line.replace('### ', '')}</h3>;
-                  } else if (line.startsWith('- ')) {
-                    return <li key={index} className="ml-4 text-muted-foreground">{line.replace('- ', '')}</li>;
-                  } else if (line.trim()) {
-                    return <p key={index} className="text-muted-foreground leading-relaxed">{line}</p>;
-                  }
-                  return null;
-                })}
-              </div>
+              <div
+                dangerouslySetInnerHTML={{ __html: project.content }}
+                className="[&>h2]:text-2xl [&>h2]:font-bold [&>h2]:mt-8 [&>h2]:mb-4 [&>h3]:text-xl [&>h3]:font-semibold [&>h3]:mt-6 [&>h3]:mb-3 [&>p]:leading-relaxed [&>ul]:space-y-2 [&>ul]:my-4 [&>ul>li]:ml-4"
+              />
             ) : (
               <p className="text-muted-foreground">
                 No detailed case study available for this project yet.
