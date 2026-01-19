@@ -5,7 +5,7 @@
 -- PROJECTS (Portfolio)
 -- ============================================
 
-INSERT INTO public.projects (title, slug, description, content, category, image_url, website_url, tags, featured, status, display_order) VALUES
+INSERT INTO novastream.projects (title, slug, description, content, category, image_url, website_url, tags, featured, status, display_order) VALUES
 
 -- CAGD Booking System
 (
@@ -477,7 +477,7 @@ INSERT INTO public.projects (title, slug, description, content, category, image_
 -- PRICING PACKAGES
 -- ============================================
 
-INSERT INTO public.pricing_packages (name, description, price, price_suffix, features, highlighted, display_order) VALUES
+INSERT INTO novastream.pricing_packages (name, description, price, price_suffix, features, highlighted, display_order) VALUES
 
 (
   'Starter',
@@ -564,7 +564,7 @@ INSERT INTO public.pricing_packages (name, description, price, price_suffix, fea
 -- TESTIMONIALS
 -- ============================================
 
-INSERT INTO public.testimonials (client_name, role, company, content, rating, featured, status, display_order) VALUES
+INSERT INTO novastream.testimonials (client_name, role, company, content, rating, featured, status, display_order) VALUES
 
 (
   'Samuel Mensah',
@@ -626,7 +626,7 @@ INSERT INTO public.testimonials (client_name, role, company, content, rating, fe
 -- FAQs
 -- ============================================
 
-INSERT INTO public.faqs (question, answer, category, display_order) VALUES
+INSERT INTO novastream.faqs (question, answer, category, display_order) VALUES
 
 (
   'How long does it take to build a website?',
