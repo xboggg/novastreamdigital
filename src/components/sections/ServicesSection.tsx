@@ -31,7 +31,7 @@ const services = [
   },
   {
     icon: HeartHandshake,
-    title: 'Ongoing Digital Care',
+    title: 'Consulting & Support',
     description: 'Continuous updates, performance optimization, and support to keep your digital presence thriving.',
     color: 'from-emerald-500 to-teal-400',
     shadowColor: 'shadow-emerald-500/20',
