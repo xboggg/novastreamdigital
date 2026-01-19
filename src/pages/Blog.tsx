@@ -23,13 +23,13 @@ interface Post {
   created_at: string;
 }
 
-const Insights = () => {
+const Blog = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const breadcrumbs = createBreadcrumbSchema([
     { name: 'Home', url: '/' },
-    { name: 'Insights', url: '/insights' },
+    { name: 'Blog', url: '/blog' },
   ]);
 
   useEffect(() => {
@@ -52,7 +52,7 @@ const Insights = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEO
-        title="Insights"
+        title="Blog"
         description="Thoughts on design, technology, and craft. Ideas, perspectives, and lessons from our work in the digital space."
         keywords="web design blog, digital insights, technology articles, design tips, Ghana tech blog"
       />
@@ -69,7 +69,7 @@ const Insights = () => {
             className="max-w-3xl"
           >
             <span className="text-sm font-medium text-primary uppercase tracking-wider mb-4 block">
-              Insights
+              Blog
             </span>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
               Thoughts on Design,{' '}
@@ -112,7 +112,7 @@ const Insights = () => {
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                 >
-                  <Link to={`/insights/${post.slug || post.id}`} className="group block">
+                  <Link to={`/blog/${post.slug || post.id}`} className="group block">
                     <div className="relative rounded-2xl overflow-hidden aspect-[3/2] mb-6">
                       <OptimizedImage
                         src={post.featured_image || 'https://images.unsplash.com/photo-1558655146-d09347e92766?w=600&h=400&fit=crop'}
@@ -170,4 +170,4 @@ const Insights = () => {
   );
 };
 
-export default Insights;
+export default Blog;

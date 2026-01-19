@@ -64,9 +64,9 @@ const PostDetail = () => {
               The article you're looking for doesn't exist or has been removed.
             </p>
             <Button asChild>
-              <Link to="/insights">
+              <Link to="/blog">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Insights
+                Back to Blog
               </Link>
             </Button>
           </div>
@@ -78,8 +78,8 @@ const PostDetail = () => {
 
   const breadcrumbs = createBreadcrumbSchema([
     { name: 'Home', url: '/' },
-    { name: 'Insights', url: '/insights' },
-    { name: post.title, url: `/insights/${slug}` },
+    { name: 'Blog', url: '/blog' },
+    { name: post.title, url: `/blog/${slug}` },
   ]);
 
   const articleSchema = createArticleSchema({
@@ -114,9 +114,9 @@ const PostDetail = () => {
             transition={{ duration: 0.3 }}
           >
             <Button variant="ghost" asChild className="mb-8">
-              <Link to="/insights">
+              <Link to="/blog">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Insights
+                Back to Blog
               </Link>
             </Button>
           </motion.div>
@@ -232,7 +232,7 @@ const PostDetail = () => {
               <div>
                 <SocialShare
                   title={post.title}
-                  url={`/insights/${slug}`}
+                  url={`/blog/${slug}`}
                   description={post.excerpt}
                 />
               </div>

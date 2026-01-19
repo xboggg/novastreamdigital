@@ -191,6 +191,285 @@ INSERT INTO novastream.projects (title, slug, description, content, category, im
   false,
   'published',
   6
+),
+
+-- GoldCoast Fashions E-commerce
+(
+  'GoldCoast Fashions',
+  'goldcoast-fashions',
+  'A premium e-commerce platform for a luxury African fashion brand with integrated payment processing.',
+  '<h2>Project Overview</h2>
+<p>We developed a sophisticated e-commerce platform for GoldCoast Fashions, showcasing their premium African-inspired fashion collections to a global audience.</p>
+
+<h2>The Challenge</h2>
+<p>GoldCoast Fashions needed an e-commerce solution that could handle international orders, multiple payment methods including mobile money, and provide an immersive shopping experience that reflected their brand''s luxury positioning.</p>
+
+<h2>Our Solution</h2>
+<ul>
+  <li>Built a custom e-commerce platform with seamless checkout</li>
+  <li>Integrated multiple payment gateways including Paystack and mobile money</li>
+  <li>Created an immersive product gallery with zoom and 360° views</li>
+  <li>Implemented inventory management and order tracking</li>
+  <li>Added multi-currency support for international customers</li>
+</ul>
+
+<h2>Results</h2>
+<p>The platform has successfully processed thousands of orders and expanded the brand''s reach to customers across Africa, Europe, and the Americas.</p>',
+  'E-commerce',
+  'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=800&h=600&fit=crop',
+  NULL,
+  ARRAY['E-commerce', 'Fashion', 'Payments', 'International'],
+  false,
+  'published',
+  7
+),
+
+-- AccraFoods Delivery App
+(
+  'AccraFoods Delivery',
+  'accrafoods-delivery',
+  'A food delivery web application connecting local restaurants with customers across Accra.',
+  '<h2>Project Overview</h2>
+<p>We created AccraFoods, a comprehensive food delivery platform that connects hungry customers with the best local restaurants in Accra and surrounding areas.</p>
+
+<h2>The Challenge</h2>
+<p>The client wanted to create a local alternative to international food delivery apps, with features tailored to the Ghanaian market including mobile money payments and motorcycle delivery tracking.</p>
+
+<h2>Our Solution</h2>
+<ul>
+  <li>Built a responsive web application for customers, restaurants, and riders</li>
+  <li>Implemented real-time order tracking with GPS integration</li>
+  <li>Created restaurant management dashboards</li>
+  <li>Integrated mobile money and card payments</li>
+  <li>Built rider assignment and route optimization features</li>
+</ul>
+
+<h2>Results</h2>
+<p>AccraFoods has onboarded over 100 restaurants and serves thousands of customers weekly, becoming a trusted local food delivery solution.</p>',
+  'Web Application',
+  'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&h=600&fit=crop',
+  NULL,
+  ARRAY['Food Delivery', 'Mobile Money', 'Real-time', 'Logistics'],
+  false,
+  'published',
+  8
+),
+
+-- Sunrise Academy
+(
+  'Sunrise Academy',
+  'sunrise-academy',
+  'An educational institution website with online learning portal and student management system.',
+  '<h2>Project Overview</h2>
+<p>We developed a comprehensive digital platform for Sunrise Academy, combining a public-facing website with an integrated learning management system.</p>
+
+<h2>The Challenge</h2>
+<p>Sunrise Academy needed to modernize their operations with a website that could handle student registrations, provide online learning capabilities, and manage parent-teacher communications effectively.</p>
+
+<h2>Our Solution</h2>
+<ul>
+  <li>Created a modern, informative school website</li>
+  <li>Built an online learning portal with video lessons and quizzes</li>
+  <li>Implemented student registration and fee payment system</li>
+  <li>Developed parent portal for grade viewing and communication</li>
+  <li>Added event calendar and announcement features</li>
+</ul>
+
+<h2>Results</h2>
+<p>The platform has streamlined school operations and enabled continued learning during challenging times, improving parent satisfaction significantly.</p>',
+  'Education Platform',
+  'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&h=600&fit=crop',
+  NULL,
+  ARRAY['Education', 'LMS', 'Student Portal', 'School Management'],
+  false,
+  'published',
+  9
+),
+
+-- GreenLeaf Properties
+(
+  'GreenLeaf Properties',
+  'greenleaf-properties',
+  'A real estate platform with property listings, virtual tours, and agent management.',
+  '<h2>Project Overview</h2>
+<p>We built a comprehensive real estate platform for GreenLeaf Properties, helping them showcase their property portfolio and connect buyers with their agents.</p>
+
+<h2>The Challenge</h2>
+<p>GreenLeaf Properties needed a modern platform that could display their extensive property listings with detailed information, virtual tours, and an easy way for prospects to schedule viewings.</p>
+
+<h2>Our Solution</h2>
+<ul>
+  <li>Created a property listing system with advanced search and filtering</li>
+  <li>Integrated 360° virtual tours for premium properties</li>
+  <li>Built agent profiles and inquiry management system</li>
+  <li>Implemented property comparison features</li>
+  <li>Added neighborhood guides and market insights</li>
+</ul>
+
+<h2>Results</h2>
+<p>The platform has significantly increased qualified leads and reduced the time-to-sale for listed properties.</p>',
+  'Real Estate',
+  'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop',
+  NULL,
+  ARRAY['Real Estate', 'Property Listings', 'Virtual Tours', 'Lead Generation'],
+  false,
+  'published',
+  10
+),
+
+-- Ghana Medical Association
+(
+  'Ghana Medical Association',
+  'ghana-medical-association',
+  'A professional association website with member directory, events, and resource library.',
+  '<h2>Project Overview</h2>
+<p>We developed a comprehensive platform for the Ghana Medical Association to serve their members and promote healthcare excellence in Ghana.</p>
+
+<h2>The Challenge</h2>
+<p>The association needed a modern platform to manage their growing membership, organize events, and provide resources to healthcare professionals across the country.</p>
+
+<h2>Our Solution</h2>
+<ul>
+  <li>Created a searchable member directory with specialization filters</li>
+  <li>Built event management with online registration and payments</li>
+  <li>Developed a resource library for medical publications and guidelines</li>
+  <li>Implemented member portal with dues payment and certification tracking</li>
+  <li>Added news and advocacy sections for public communication</li>
+</ul>
+
+<h2>Results</h2>
+<p>The platform has improved member engagement and streamlined administrative processes for the association.</p>',
+  'Association Website',
+  'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=800&h=600&fit=crop',
+  NULL,
+  ARRAY['Healthcare', 'Association', 'Member Portal', 'Events'],
+  false,
+  'published',
+  11
+),
+
+-- TransGhana Logistics
+(
+  'TransGhana Logistics',
+  'transghana-logistics',
+  'A fleet management and logistics platform for a major transportation company.',
+  '<h2>Project Overview</h2>
+<p>We built a comprehensive fleet management system for TransGhana Logistics, helping them optimize their operations and track deliveries in real-time.</p>
+
+<h2>The Challenge</h2>
+<p>TransGhana needed to modernize their fleet management with real-time tracking, route optimization, and customer communication tools to improve efficiency and service quality.</p>
+
+<h2>Our Solution</h2>
+<ul>
+  <li>Built GPS-based fleet tracking with real-time dashboard</li>
+  <li>Implemented route optimization algorithms</li>
+  <li>Created driver management with performance metrics</li>
+  <li>Developed customer portal for shipment tracking</li>
+  <li>Added maintenance scheduling and fuel tracking</li>
+</ul>
+
+<h2>Results</h2>
+<p>The system has reduced fuel costs by 15% and improved on-time delivery rates to over 95%.</p>',
+  'Web Application',
+  'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800&h=600&fit=crop',
+  NULL,
+  ARRAY['Logistics', 'Fleet Management', 'GPS Tracking', 'Transportation'],
+  false,
+  'published',
+  12
+),
+
+-- Volta River Authority
+(
+  'VRA Corporate Portal',
+  'vra-corporate-portal',
+  'A corporate website and employee portal for Ghana''s leading power generation company.',
+  '<h2>Project Overview</h2>
+<p>We redesigned the corporate website and built an integrated employee portal for the Volta River Authority, Ghana''s premier power generation organization.</p>
+
+<h2>The Challenge</h2>
+<p>VRA needed a modern website that communicated their mission and achievements while providing employees with self-service tools and internal resources.</p>
+
+<h2>Our Solution</h2>
+<ul>
+  <li>Redesigned the corporate website with modern aesthetics</li>
+  <li>Built employee self-service portal with leave management</li>
+  <li>Created project showcase for major infrastructure projects</li>
+  <li>Implemented document management system</li>
+  <li>Added investor relations and sustainability reporting sections</li>
+</ul>
+
+<h2>Results</h2>
+<p>The new platform has improved internal communications and enhanced the organization''s public image.</p>',
+  'Corporate Website',
+  'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=800&h=600&fit=crop',
+  NULL,
+  ARRAY['Energy', 'Corporate', 'Employee Portal', 'Government'],
+  true,
+  'published',
+  13
+),
+
+-- KofiTech Startups
+(
+  'KofiTech Startup Hub',
+  'kofitech-startup-hub',
+  'A startup incubator platform with application management, mentorship matching, and resource center.',
+  '<h2>Project Overview</h2>
+<p>We developed a comprehensive platform for KofiTech, a leading startup incubator in West Africa, to manage their accelerator programs and support portfolio companies.</p>
+
+<h2>The Challenge</h2>
+<p>KofiTech needed a platform to handle startup applications, match founders with mentors, and provide resources to their growing portfolio of tech startups.</p>
+
+<h2>Our Solution</h2>
+<ul>
+  <li>Built startup application and screening system</li>
+  <li>Created mentor matching algorithm based on industry and expertise</li>
+  <li>Developed resource library with templates and guides</li>
+  <li>Implemented portfolio company dashboard</li>
+  <li>Added investor network and demo day features</li>
+</ul>
+
+<h2>Results</h2>
+<p>The platform has helped process over 500 applications and supported 50+ startups through their accelerator programs.</p>',
+  'Web Application',
+  'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=800&h=600&fit=crop',
+  NULL,
+  ARRAY['Startup', 'Incubator', 'Mentorship', 'Investment'],
+  false,
+  'published',
+  14
+),
+
+-- AfricaArt Gallery
+(
+  'AfricaArt Online Gallery',
+  'africaart-gallery',
+  'An online art marketplace showcasing and selling African contemporary art to global collectors.',
+  '<h2>Project Overview</h2>
+<p>We created an elegant online gallery for AfricaArt, connecting African artists with art collectors and enthusiasts worldwide.</p>
+
+<h2>The Challenge</h2>
+<p>AfricaArt wanted a platform that would do justice to their curated collection while providing a seamless purchasing experience for international collectors.</p>
+
+<h2>Our Solution</h2>
+<ul>
+  <li>Built immersive art viewing experience with high-resolution images</li>
+  <li>Created artist profiles and portfolio pages</li>
+  <li>Implemented secure checkout with international shipping</li>
+  <li>Added virtual exhibition features</li>
+  <li>Built collector accounts with wishlist and purchase history</li>
+</ul>
+
+<h2>Results</h2>
+<p>The platform has facilitated sales to collectors in over 20 countries and significantly increased artist exposure.</p>',
+  'E-commerce',
+  'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=800&h=600&fit=crop',
+  NULL,
+  ARRAY['Art', 'E-commerce', 'Gallery', 'International'],
+  false,
+  'published',
+  15
 );
 
 

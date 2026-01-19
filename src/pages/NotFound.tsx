@@ -90,7 +90,7 @@ const NotFound = () => {
               {[
                 { name: 'Services', href: '/services' },
                 { name: 'Portfolio', href: '/portfolio' },
-                { name: 'Insights', href: '/insights' },
+                { name: 'Blog', href: '/blog' },
                 { name: 'Contact', href: '/contact' },
               ].map((link) => (
                 <Link

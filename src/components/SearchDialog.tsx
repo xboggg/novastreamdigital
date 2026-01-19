@@ -130,7 +130,7 @@ export const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
 
   const handleSelect = (result: SearchResult) => {
     const path = result.type === 'post'
-      ? `/insights/${result.slug || result.id}`
+      ? `/blog/${result.slug || result.id}`
       : `/portfolio/${result.slug || result.id}`;
     navigate(path);
     onOpenChange(false);

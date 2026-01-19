@@ -30,7 +30,7 @@ export const websiteSchema = {
   url: BASE_URL,
   potentialAction: {
     '@type': 'SearchAction',
-    target: `${BASE_URL}/insights?search={search_term_string}`,
+    target: `${BASE_URL}/blog?search={search_term_string}`,
     'query-input': 'required name=search_term_string',
   },
 };
@@ -159,7 +159,7 @@ export const createArticleSchema = (article: {
   headline: article.title,
   description: article.description,
   image: article.image || `${BASE_URL}/og-image.png`,
-  url: `${BASE_URL}/insights/${article.slug}`,
+  url: `${BASE_URL}/blog/${article.slug}`,
   datePublished: article.publishedAt,
   dateModified: article.modifiedAt || article.publishedAt,
   author: {

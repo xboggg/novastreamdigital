@@ -106,7 +106,7 @@ export const RelatedPosts = ({
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-2xl font-bold">Related Articles</h2>
         <Link
-          to="/insights"
+          to="/blog"
           className="text-sm text-primary hover:underline flex items-center gap-1"
         >
           View all
@@ -122,7 +122,7 @@ export const RelatedPosts = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: index * 0.1 }}
           >
-            <Link to={`/insights/${post.slug || post.id}`} className="group block">
+            <Link to={`/blog/${post.slug || post.id}`} className="group block">
               <div className="relative rounded-xl overflow-hidden aspect-[3/2] mb-4">
                 <OptimizedImage
                   src={post.featured_image || 'https://images.unsplash.com/photo-1558655146-d09347e92766?w=400&h=300&fit=crop'}
