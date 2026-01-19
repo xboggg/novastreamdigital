@@ -74,9 +74,9 @@ const About = () => {
                   that handle real-world demands.
                 </p>
                 <p>
-                  We leverage modern technologies and AI-assisted development to deliver
-                  high-quality solutions faster than traditional agencies, without compromising
-                  on craftsmanship or attention to detail.
+                  We leverage modern technologies and streamlined development processes to deliver
+                  high-quality solutions efficiently, without compromising on craftsmanship or
+                  attention to detail.
                 </p>
                 <p>
                   Whether you're a startup looking for your first website, an NGO needing a

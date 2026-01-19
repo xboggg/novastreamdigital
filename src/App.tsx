@@ -8,7 +8,6 @@ import { ThemeProvider } from "@/hooks/useTheme";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { InstallPromptBanner } from "@/components/pwa/InstallPromptBanner";
-import { NotificationPrompt } from "@/components/pwa/NotificationPrompt";
 import { CookieConsent } from "./components/CookieConsent";
 import { PageLoader } from "@/components/PageLoader";
 import { ScrollToTop } from "@/components/ScrollToTop";
@@ -58,7 +57,6 @@ const App = () => (
           <BrowserRouter>
             <ScrollToTop />
             <InstallPromptBanner />
-            <NotificationPrompt />
             <Suspense fallback={<PageLoader />}>
               <Routes>
                 <Route path="/" element={<Index />} />
