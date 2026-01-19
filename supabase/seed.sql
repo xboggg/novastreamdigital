@@ -202,37 +202,39 @@ INSERT INTO novastream.pricing_packages (name, description, price, price_suffix,
 
 (
   'Starter',
-  'Perfect for small businesses and personal brands',
-  'GHS 2,500',
-  'starting from',
+  'Perfect for individuals and small businesses',
+  'GHS 3,500 - 5,000',
+  'per project',
   ARRAY[
     'Up to 5 pages',
     'Mobile-responsive design',
-    'Contact form',
-    'Social media integration',
+    'Contact form integration',
+    'Social media links',
     'Basic SEO optimization',
+    'SSL certificate included',
     '1 month support',
-    'SSL certificate included'
+    '1-2 week delivery'
   ],
   false,
   1
 ),
 
 (
-  'Professional',
-  'Ideal for growing businesses needing more features',
-  'GHS 5,000',
-  'starting from',
+  'Business',
+  'Ideal for SMEs and corporate organizations',
+  'GHS 6,000 - 10,000',
+  'per project',
   ARRAY[
-    'Up to 10 pages',
-    'Custom design',
+    'Up to 15 pages',
+    'Custom design & branding',
     'Content management system',
     'Blog functionality',
     'Advanced SEO optimization',
-    'Google Analytics setup',
-    'Email newsletter integration',
+    'Google Analytics integration',
+    'Email newsletter setup',
+    'E-commerce ready (up to 50 products)',
     '3 months support',
-    'Performance optimization'
+    '2-4 week delivery'
   ],
   true,
   2
@@ -240,23 +242,42 @@ INSERT INTO novastream.pricing_packages (name, description, price, price_suffix,
 
 (
   'Enterprise',
-  'For organizations requiring custom solutions',
-  'Custom',
-  'quote',
+  'Custom apps and complex systems',
+  'GHS 15,000 - 50,000+',
+  'per project',
   ARRAY[
     'Unlimited pages',
     'Custom web applications',
-    'E-commerce capabilities',
-    'Third-party integrations',
+    'Booking & reservation systems',
+    'Management platforms',
+    'Third-party API integrations',
     'Database development',
-    'User authentication systems',
+    'User authentication & roles',
     'Admin dashboards',
-    'API development',
-    '12 months support',
-    'Priority support'
+    'Priority support',
+    '6 months support included'
   ],
   false,
   3
+),
+
+(
+  'Maintenance',
+  'Keep your digital presence running smoothly',
+  'GHS 500 - 2,000',
+  'per month',
+  ARRAY[
+    'Regular updates & backups',
+    'Security monitoring',
+    'Performance optimization',
+    'Content updates (up to 5 hours)',
+    'Monthly reports',
+    'Priority email support',
+    'Uptime monitoring',
+    '24-hour response time'
+  ],
+  false,
+  4
 );
 
 

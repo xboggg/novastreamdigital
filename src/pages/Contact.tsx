@@ -246,7 +246,7 @@ const Contact = () => {
             </motion.span>
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
               Let's Create Something{' '}
-              <span className="gradient-text text-glow">Extraordinary</span>
+              <span className="gradient-text">Extraordinary</span>
             </h1>
             <p className="text-lg text-muted-foreground">
               Tell us about your project and we'll get back to you within 24-48 hours.

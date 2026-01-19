@@ -64,7 +64,7 @@ const services = [
   {
     id: 'support',
     icon: HeartHandshake,
-    title: 'Ongoing Digital Care',
+    title: 'Consulting & Support',
     description: 'Continuous support and optimization to keep your digital presence thriving. We become an extension of your team.',
     color: 'from-emerald-500 to-teal-400',
     shadowColor: 'shadow-emerald-500/20',
@@ -140,7 +140,7 @@ const Services = () => {
             </motion.span>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
               Everything You Need to{' '}
-              <span className="gradient-text text-glow">Thrive Online</span>
+              <span className="gradient-text">Thrive Online</span>
             </h1>
             <p className="text-xl text-muted-foreground leading-relaxed">
               From stunning websites to powerful applications, we provide comprehensive

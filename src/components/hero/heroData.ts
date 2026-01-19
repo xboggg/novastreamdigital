@@ -80,20 +80,20 @@ export const heroServices: HeroService[] = [
   {
     id: 'care',
     icon: HeartHandshake,
-    title: 'Ongoing Digital Care',
+    title: 'Consulting & Support',
     tagline: 'Continuous Growth & Support',
     description: 'Dedicated partnership to maintain, optimize, and evolve your digital presence as your business grows.',
-    // Black African professionals working on tech/design - Pexels
-    videoUrl: 'https://videos.pexels.com/video-files/5699295/5699295-uhd_2560_1440_25fps.mp4',
-    posterUrl: 'https://images.pexels.com/videos/5699295/pexels-photo-5699295.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    // Professional tech/business video - Pexels
+    videoUrl: 'https://videos.pexels.com/video-files/7989582/7989582-uhd_2560_1440_25fps.mp4',
+    posterUrl: 'https://images.pexels.com/videos/7989582/pexels-photo-7989582.jpeg?auto=compress&cs=tinysrgb&w=1920',
     colors: {
-      primary: 'hsl(160, 84%, 39%)',
-      secondary: 'hsl(172, 66%, 50%)',
-      gradient: 'linear-gradient(135deg, hsl(160 84% 39%), hsl(172 66% 50%))',
+      primary: 'hsl(220, 70%, 50%)',
+      secondary: 'hsl(250, 60%, 55%)',
+      gradient: 'linear-gradient(135deg, hsl(220 70% 50%), hsl(250 60% 55%))',
     },
     cta: {
       text: 'Learn More',
-      link: '/services#care',
+      link: '/services#support',
     },
   },
 ];

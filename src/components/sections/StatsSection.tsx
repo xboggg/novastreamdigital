@@ -12,11 +12,13 @@ const stats = [
 const AnimatedCounter = ({
   value,
   suffix,
-  isInView
+  isInView,
+  colorClass
 }: {
   value: number;
   suffix: string;
   isInView: boolean;
+  colorClass: string;
 }) => {
   const [count, setCount] = useState(0);
 
@@ -43,7 +45,7 @@ const AnimatedCounter = ({
   }, [value, isInView]);
 
   return (
-    <span className="text-4xl md:text-5xl lg:text-6xl font-bold gradient-text text-glow">
+    <span className={`text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-br ${colorClass} bg-clip-text text-transparent`}>
       {count}{suffix}
     </span>
   );
@@ -130,6 +132,7 @@ export const StatsSection = () => {
                     value={stat.value}
                     suffix={stat.suffix}
                     isInView={isInView}
+                    colorClass={stat.color}
                   />
                 </div>
 

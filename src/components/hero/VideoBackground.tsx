@@ -106,38 +106,38 @@ export const VideoBackground = ({ service, isActive, mouseX, mouseY }: VideoBack
             />
           )}
 
-          {/* Minimal left side gradient for text readability only */}
-          <div 
+          {/* Dark overlay for better video visibility */}
+          <div className="absolute inset-0 bg-black/30" />
+
+          {/* Left side gradient for text readability */}
+          <div
             className="absolute inset-0"
             style={{
               background: `
-                linear-gradient(to right, 
-                  hsl(var(--background) / 0.7) 0%,
-                  hsl(var(--background) / 0.3) 30%,
-                  transparent 60%
+                linear-gradient(to right,
+                  rgba(0, 0, 0, 0.7) 0%,
+                  rgba(0, 0, 0, 0.4) 40%,
+                  transparent 70%
                 )
               `,
             }}
           />
 
-          {/* Top gradient fade - very subtle */}
-          <div 
-            className="absolute inset-x-0 top-0 h-24"
+          {/* Top gradient fade for navbar */}
+          <div
+            className="absolute inset-x-0 top-0 h-32"
             style={{
-              background: 'linear-gradient(to bottom, hsl(var(--background) / 0.5), transparent)',
+              background: 'linear-gradient(to bottom, rgba(0, 0, 0, 0.5), transparent)',
             }}
           />
 
           {/* Bottom gradient fade */}
-          <div 
-            className="absolute inset-x-0 bottom-0 h-40"
+          <div
+            className="absolute inset-x-0 bottom-0 h-48"
             style={{
               background: 'linear-gradient(to top, hsl(var(--background)), transparent)',
             }}
           />
-
-          {/* Noise texture overlay - subtle */}
-          <div className="absolute inset-0 noise-overlay opacity-20 pointer-events-none" />
         </motion.div>
       )}
     </AnimatePresence>

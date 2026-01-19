@@ -35,41 +35,44 @@ const clients = [
 
 export const ClientLogosSection = () => {
   return (
-    <section className="py-16 border-y border-border/50">
+    <section className="py-20 bg-gradient-to-b from-background via-surface-overlay/30 to-background">
       <div className="container-custom">
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center text-sm text-muted-foreground uppercase tracking-wider mb-10"
+          className="text-center mb-12"
         >
-          Trusted by Organizations Across Industries
-        </motion.p>
+          <span className="text-sm font-medium text-primary uppercase tracking-wider mb-4 block">
+            Our Clients
+          </span>
+          <h2 className="text-2xl md:text-3xl font-bold mb-4">
+            Trusted by Organizations Across Industries
+          </h2>
+        </motion.div>
 
-        {/* Logo carousel - infinite scroll effect */}
-        <div className="relative overflow-hidden">
-          <div className="flex gap-12 items-center justify-center flex-wrap md:flex-nowrap">
-            {clients.map((client, index) => (
-              <motion.div
-                key={client.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: index * 0.1 }}
-                className="group flex flex-col items-center min-w-[120px]"
-              >
-                {/* Placeholder for logo - using text until actual logos are available */}
-                <div className="h-12 flex items-center justify-center px-4 py-2 rounded-lg bg-secondary/50 group-hover:bg-secondary transition-colors">
-                  <span className="text-lg font-semibold text-muted-foreground group-hover:text-foreground transition-colors whitespace-nowrap">
-                    {client.name}
-                  </span>
-                </div>
-                <span className="text-xs text-muted-foreground mt-2 opacity-0 group-hover:opacity-100 transition-opacity text-center">
+        {/* Client logos grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-12">
+          {clients.map((client, index) => (
+            <motion.div
+              key={client.name}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: index * 0.08 }}
+              whileHover={{ y: -4, scale: 1.02 }}
+              className="group"
+            >
+              <div className="h-24 flex flex-col items-center justify-center p-4 rounded-xl bg-card border border-border/50 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
+                <span className="text-base font-semibold text-foreground group-hover:text-primary transition-colors text-center">
+                  {client.name}
+                </span>
+                <span className="text-xs text-muted-foreground mt-1 text-center line-clamp-1">
                   {client.description}
                 </span>
-              </motion.div>
-            ))}
-          </div>
+              </div>
+            </motion.div>
+          ))}
         </div>
 
         {/* Industries served */}
@@ -78,15 +81,19 @@ export const ClientLogosSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="flex flex-wrap justify-center gap-3 mt-12"
+          className="flex flex-wrap justify-center gap-3"
         >
-          {['Government', 'Healthcare', 'Engineering', 'NGOs', 'Finance', 'Education'].map((industry) => (
-            <span
+          {['Government', 'Healthcare', 'Engineering', 'NGOs', 'Finance', 'Education'].map((industry, index) => (
+            <motion.span
               key={industry}
-              className="px-4 py-2 rounded-full bg-secondary text-sm text-muted-foreground"
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.4 + index * 0.05 }}
+              className="px-4 py-2 rounded-full border border-border/50 text-sm text-muted-foreground hover:border-primary/30 hover:text-foreground transition-all"
             >
               {industry}
-            </span>
+            </motion.span>
           ))}
         </motion.div>
       </div>

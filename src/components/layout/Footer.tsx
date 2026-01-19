@@ -10,7 +10,7 @@ const footerLinks = {
     { name: 'Website Design', href: '/services#websites' },
     { name: 'Web Applications', href: '/services#applications' },
     { name: 'Visual Identity', href: '/services#design' },
-    { name: 'Digital Care', href: '/services#support' },
+    { name: 'Consulting & Support', href: '/services#support' },
   ],
   company: [
     { name: 'About', href: '/about' },
