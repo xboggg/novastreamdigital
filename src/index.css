@@ -44,10 +44,10 @@
     /* Extended Palette */
     --glow-primary: 230 80% 55%;
     --glow-accent: 260 70% 60%;
-    --gradient-start: 230 80% 55%;
-    --gradient-end: 270 70% 55%;
-    --gradient-secondary-start: 180 70% 45%;
-    --gradient-secondary-end: 210 80% 50%;
+    --gradient-start: 230 85% 45%;
+    --gradient-end: 260 80% 50%;
+    --gradient-secondary-start: 180 80% 35%;
+    --gradient-secondary-end: 210 85% 45%;
     
     /* Surface layers */
     --surface-elevated: 0 0% 100%;

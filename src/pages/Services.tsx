@@ -168,25 +168,27 @@ const Services = () => {
                   {/* Highlighted badge */}
                   {service.highlighted && (
                     <motion.div
-                      initial={{ opacity: 0, x: -20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
+                      initial={{ opacity: 0, y: -10 }}
+                      whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ delay: 0.2 }}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-6 animate-pulse-glow"
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-4"
                     >
-                      <Sparkles className="w-4 h-4 animate-pulse" />
+                      <Sparkles className="w-4 h-4" />
                       Our Specialty
                     </motion.div>
                   )}
 
-                  {/* Icon with animation */}
-                  <motion.div
-                    whileHover={{ rotate: [0, -10, 10, 0], scale: 1.1 }}
-                    transition={{ duration: 0.5 }}
-                    className={`inline-flex p-4 rounded-2xl bg-gradient-to-br ${service.color} mb-6 shadow-lg ${service.shadowColor}`}
-                  >
-                    <service.icon className="w-8 h-8 text-white" />
-                  </motion.div>
+                  {/* Icon with animation - on new line */}
+                  <div className="mb-6">
+                    <motion.div
+                      whileHover={{ rotate: [0, -10, 10, 0], scale: 1.1 }}
+                      transition={{ duration: 0.5 }}
+                      className={`inline-flex p-4 rounded-2xl bg-gradient-to-br ${service.color} shadow-lg ${service.shadowColor}`}
+                    >
+                      <service.icon className="w-8 h-8 text-white" />
+                    </motion.div>
+                  </div>
 
                   <h2 className="text-3xl md:text-4xl font-bold mb-4">
                     {service.title}
@@ -232,44 +234,15 @@ const Services = () => {
                 {/* Enhanced visual card */}
                 <motion.div
                   className={`relative ${index % 2 === 1 ? 'md:order-1' : ''}`}
-                  whileHover={{ scale: 1.02 }}
+                  whileHover={{ scale: 1.01 }}
                   transition={{ duration: 0.3 }}
                 >
-                  {/* Glow effect behind */}
-                  <div className={`absolute inset-0 bg-gradient-to-br ${service.color} opacity-20 blur-3xl rounded-full`} />
+                  {/* Subtle glow effect behind */}
+                  <div className={`absolute inset-4 bg-gradient-to-br ${service.color} opacity-10 blur-2xl rounded-full`} />
 
-                  {/* Floating decorative elements */}
-                  <motion.div
-                    animate={{ y: [-10, 10, -10], rotate: [0, 5, 0] }}
-                    transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                    className={`absolute -top-6 -right-6 w-16 h-16 bg-gradient-to-br ${service.color} opacity-30 rounded-2xl blur-sm`}
-                  />
-                  <motion.div
-                    animate={{ y: [10, -10, 10], rotate: [0, -5, 0] }}
-                    transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute -bottom-6 -left-6 w-12 h-12 bg-accent/20 rounded-full blur-sm"
-                  />
-
-                  <div className={`aspect-square rounded-3xl bg-gradient-to-br ${service.color} opacity-10 animate-breathe`} />
-                  <div className="absolute inset-8 rounded-2xl card-3d flex items-center justify-center overflow-hidden">
-                    {/* Shimmer effect */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full hover:translate-x-full transition-transform duration-1000" />
-
-                    <motion.div
-                      animate={{ scale: [1, 1.05, 1], rotate: [0, 2, 0] }}
-                      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                    >
-                      <service.icon className={`w-24 h-24 text-muted-foreground/20`} />
-                    </motion.div>
-
-                    {/* Orbiting dot */}
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                      className="absolute inset-0 flex items-center justify-center"
-                    >
-                      <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${service.color} absolute top-8 shadow-lg`} />
-                    </motion.div>
+                  <div className={`aspect-square rounded-3xl bg-gradient-to-br ${service.color} opacity-5`} />
+                  <div className="absolute inset-6 rounded-2xl card-3d flex items-center justify-center overflow-hidden">
+                    <service.icon className={`w-20 h-20 text-muted-foreground/15`} />
                   </div>
                 </motion.div>
               </motion.div>

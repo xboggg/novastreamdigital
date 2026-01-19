@@ -1,7 +1,7 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useRef } from 'react';
-import { ArrowRight, Sparkles, Rocket } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export const CTASection = () => {
@@ -87,29 +87,6 @@ export const CTASection = () => {
             <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 rounded-3xl blur-2xl animate-pulse-glow" />
 
             <div className="card-3d p-12 md:p-16 text-center relative overflow-hidden">
-              {/* Rotating border accent */}
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-                className="absolute -top-20 -right-20 w-40 h-40 border border-primary/10 rounded-full"
-              />
-              <motion.div
-                animate={{ rotate: -360 }}
-                transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-                className="absolute -bottom-20 -left-20 w-48 h-48 border border-accent/10 rounded-full"
-              />
-
-              {/* Floating icon */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.3, type: "spring" }}
-                className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent mb-8 shadow-lg shadow-primary/20"
-              >
-                <Rocket className="w-8 h-8 text-white animate-bounce" />
-              </motion.div>
-
               <motion.span
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
@@ -117,13 +94,13 @@ export const CTASection = () => {
                 transition={{ delay: 0.2 }}
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-6"
               >
-                <Sparkles className="w-4 h-4 animate-pulse" />
+                <Sparkles className="w-4 h-4" />
                 Let's Build Together
               </motion.span>
 
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 relative">
                 Ready to Transform Your{' '}
-                <span className="gradient-text text-glow">Digital Presence?</span>
+                <span className="gradient-text">Digital Presence?</span>
               </h2>
 
               <p className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto relative">

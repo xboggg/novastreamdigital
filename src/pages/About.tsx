@@ -70,7 +70,7 @@ const About = () => {
             </motion.span>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
               Building Digital Solutions{' '}
-              <span className="gradient-text text-glow">That Matter</span>
+              <span className="gradient-text">That Matter</span>
             </h1>
             <p className="text-xl text-muted-foreground leading-relaxed">
               We're a Ghana-based digital agency passionate about creating powerful
@@ -355,18 +355,6 @@ const About = () => {
             <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 rounded-3xl blur-3xl animate-pulse-glow" />
 
             <div className="card-3d p-12 md:p-16 text-center relative overflow-hidden">
-              {/* Animated particles */}
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                className="absolute top-10 right-10 w-20 h-20 border border-primary/20 rounded-full"
-              />
-              <motion.div
-                animate={{ rotate: -360 }}
-                transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-                className="absolute bottom-10 left-10 w-32 h-32 border border-accent/20 rounded-full"
-              />
-
               <h2 className="text-3xl md:text-4xl font-bold mb-4 relative">
                 Ready to Build Something <span className="gradient-text">Great?</span>
               </h2>
