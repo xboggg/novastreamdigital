@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-const BASE_URL = 'https://novastreamdigital.techtrendi.com';
+const BASE_URL = 'https://novastreamdigital.com';
 
 // Organization Schema
 export const organizationSchema = {

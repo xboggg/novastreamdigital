@@ -1,48 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://novastreamdigital.techtrendi.com/</loc>
+    <loc>https://novastreamdigital.com/</loc>
+    <lastmod>2026-02-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://novastreamdigital.techtrendi.com/services</loc>
+    <loc>https://novastreamdigital.com/services</loc>
+    <lastmod>2026-02-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://novastreamdigital.techtrendi.com/portfolio</loc>
+    <loc>https://novastreamdigital.com/portfolio</loc>
+    <lastmod>2026-02-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://novastreamdigital.techtrendi.com/about</loc>
+    <loc>https://novastreamdigital.com/about</loc>
+    <lastmod>2026-02-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://novastreamdigital.techtrendi.com/insights</loc>
+    <loc>https://novastreamdigital.com/blog</loc>
+    <lastmod>2026-02-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://novastreamdigital.techtrendi.com/contact</loc>
+    <loc>https://novastreamdigital.com/contact</loc>
+    <lastmod>2026-02-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://novastreamdigital.techtrendi.com/pricing</loc>
+    <loc>https://novastreamdigital.com/pricing</loc>
+    <lastmod>2026-02-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://novastreamdigital.techtrendi.com/privacy</loc>
+    <loc>https://novastreamdigital.com/privacy</loc>
+    <lastmod>2026-02-23</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://novastreamdigital.techtrendi.com/terms</loc>
+    <loc>https://novastreamdigital.com/terms</loc>
+    <lastmod>2026-02-23</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://novastreamdigital.com/install</loc>
+    <lastmod>2026-02-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url>
 </urlset>

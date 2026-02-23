@@ -2,8 +2,14 @@ const http = require('http');
 const { exec } = require('child_process');
 const crypto = require('crypto');
 
-const SECRET = 'novastream-webhook-secret-2026';
-const PORT = 9456;
+// SECURITY: Secret must be set via environment variable
+const SECRET = process.env.WEBHOOK_SECRET;
+const PORT = process.env.WEBHOOK_PORT || 9456;
+
+if (!SECRET) {
+  console.error('FATAL: WEBHOOK_SECRET environment variable is not set!');
+  process.exit(1);
+}
 
 http.createServer((req, res) => {
   if (req.method === 'POST' && req.url === '/deploy') {

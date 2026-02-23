@@ -13,7 +13,7 @@ interface SEOProps {
   noindex?: boolean;
 }
 
-const BASE_URL = 'https://novastreamdigital.techtrendi.com';
+const BASE_URL = 'https://novastreamdigital.com';
 const DEFAULT_IMAGE = `${BASE_URL}/og-image.png`;
 const SITE_NAME = 'NovaStream Digital';
 

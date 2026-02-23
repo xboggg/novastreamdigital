@@ -1,5 +1,5 @@
 # NovaStream Digital - Robots.txt
-# https://novastreamdigital.techtrendi.com
+# https://novastreamdigital.com
 
 User-agent: Googlebot
 Allow: /
@@ -20,4 +20,4 @@ Allow: /
 Disallow: /admin/
 
 # Sitemap
-Sitemap: https://novastreamdigital.techtrendi.com/sitemap.xml
+Sitemap: https://novastreamdigital.com/sitemap.xml
