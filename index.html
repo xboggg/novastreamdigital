@@ -39,10 +39,117 @@
 
     <!-- Theme color for browser UI -->
     <meta name="theme-color" content="#0a1628" />
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BXCGXEJ4WC"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-BXCGXEJ4WC');
+    </script>
+
+    <!-- Static Structured Data (crawlable without JS) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "NovaStream Digital",
+      "url": "https://novastreamdigital.com",
+      "logo": "https://novastreamdigital.com/og-image.png",
+      "description": "NovaStream Digital crafts refined websites and web applications for modern businesses in Ghana and worldwide.",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "email": "hello@novastreamdigital.com",
+        "contactType": "customer service"
+      },
+      "sameAs": [
+        "https://twitter.com/NovaStreamDigi",
+        "https://linkedin.com/company/novastreamdigital",
+        "https://instagram.com/novastreamdigital"
+      ],
+      "areaServed": "Worldwide",
+      "foundingLocation": {
+        "@type": "Place",
+        "name": "Accra, Ghana"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "NovaStream Digital",
+      "url": "https://novastreamdigital.com",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://novastreamdigital.com/blog?search={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ProfessionalService",
+      "name": "NovaStream Digital",
+      "url": "https://novastreamdigital.com",
+      "image": "https://novastreamdigital.com/og-image.png",
+      "description": "Digital agency specializing in web design, web development, and brand identity for businesses, NGOs, and government institutions in Ghana.",
+      "priceRange": "$$",
+      "areaServed": { "@type": "Place", "name": "Worldwide" },
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Digital Services",
+        "itemListElement": [
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Website Design & Development", "description": "Captivating business websites, portfolios, and e-commerce experiences that convert visitors into customers." } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Web Applications", "description": "Custom web applications — dashboards, booking systems, and platforms that streamline operations and scale with your business." } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Visual Identity & Design", "description": "Distinctive visual identities, brand strategy, and marketing materials that tell your story." } },
+          { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Consulting & Support", "description": "Continuous updates, performance optimization, and dedicated partnership to maintain your digital presence." } }
+        ]
+      }
+    }
+    </script>
   </head>
 
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+
+    <!-- SEO fallback for crawlers that don't execute JavaScript -->
+    <noscript>
+      <div>
+        <h1>NovaStream Digital — Designing Digital Experiences That Flow</h1>
+        <p>NovaStream Digital crafts refined websites and web applications for modern businesses in Ghana and worldwide. From captivating designs to powerful platforms.</p>
+
+        <h2>Our Services</h2>
+        <h3>Website Design & Development</h3>
+        <p>Captivating business websites, portfolios, and e-commerce experiences that convert visitors into customers.</p>
+        <h3>Web Applications</h3>
+        <p>Custom web applications that streamline operations, boost productivity, and scale with your business. Powerful dashboards, booking systems, and custom platforms.</p>
+        <h3>Visual Identity & Design</h3>
+        <p>Distinctive visual identities that tell your story and create lasting impressions across every touchpoint.</p>
+        <h3>Consulting & Support</h3>
+        <p>Continuous updates, performance optimization, and support to keep your digital presence thriving.</p>
+
+        <h2>Our Philosophy</h2>
+        <p>Design is not decoration. Technology is not noise. Every pixel serves a purpose. Every interaction tells a story. We believe in digital experiences that feel inevitable — where form and function merge into something truly meaningful.</p>
+
+        <h2>Trusted by Organizations Across Industries</h2>
+        <p>We've helped organizations from startups to government institutions build their digital presence, including CAGD (Controller & Accountant General's Department), TechTrendi, Adomah Kidney Care, Matech Global, I&P Global, and Terrexo Engineering.</p>
+
+        <h2>Contact</h2>
+        <p>Let's create something extraordinary together. Visit <a href="https://novastreamdigital.com/contact">novastreamdigital.com/contact</a> or email hello@novastreamdigital.com.</p>
+
+        <nav>
+          <a href="/services">Services</a> |
+          <a href="/portfolio">Portfolio</a> |
+          <a href="/about">About</a> |
+          <a href="/blog">Blog</a> |
+          <a href="/pricing">Pricing</a> |
+          <a href="/contact">Contact</a>
+        </nav>
+      </div>
+    </noscript>
   </body>
 </html>

@@ -137,7 +137,7 @@ const Privacy = () => {
                 </p>
                 <p className="text-muted-foreground mt-2">
                   <strong>Email:</strong> privacy@novastreamdigital.com<br />
-                  <strong>Website:</strong> novastreamdigital.techtrendi.com/contact
+                  <strong>Website:</strong> novastreamdigital.com/contact
                 </p>
               </section>
             </div>

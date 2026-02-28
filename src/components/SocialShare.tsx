@@ -10,7 +10,7 @@ interface SocialShareProps {
   variant?: 'horizontal' | 'vertical';
 }
 
-const BASE_URL = 'https://novastreamdigital.techtrendi.com';
+const BASE_URL = 'https://novastreamdigital.com';
 
 export const SocialShare = ({
   title,
