@@ -15,6 +15,7 @@ const footerLinks = {
   company: [
     { name: 'About', href: '/about' },
     { name: 'Portfolio', href: '/portfolio' },
+    { name: 'Pricing', href: '/pricing' },
     { name: 'Blog', href: '/blog' },
     { name: 'Contact', href: '/contact' },
   ],
@@ -137,7 +138,7 @@ export const Footer = () => {
               applications for modern businesses.
             </p>
             <div className="flex gap-3">
-              {socialLinks.map((social) => (
+              {socialLinks.filter(s => s.href && s.href !== '#').map((social) => (
                 <motion.a
                   key={social.name}
                   href={social.href}

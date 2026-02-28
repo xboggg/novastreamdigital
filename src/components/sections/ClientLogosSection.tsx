@@ -3,33 +3,39 @@ import { motion } from 'framer-motion';
 const clients = [
   {
     name: 'CAGD',
-    logo: '/clients/cagd-logo.png',
     description: 'Controller & Accountant General\'s Department',
+    initials: 'CA',
+    color: 'from-blue-500 to-cyan-400',
   },
   {
     name: 'I&P Global',
-    logo: '/clients/ipglobal-logo.png',
     description: 'Engineering Solutions',
+    initials: 'IP',
+    color: 'from-violet-500 to-purple-400',
   },
   {
     name: 'Terrexo Engineering',
-    logo: '/clients/terrexo-logo.png',
     description: 'Engineering Excellence',
+    initials: 'TE',
+    color: 'from-emerald-500 to-teal-400',
   },
   {
     name: 'Adomah Kidney Care',
-    logo: '/clients/adomah-logo.png',
     description: 'Healthcare Foundation',
+    initials: 'AK',
+    color: 'from-rose-500 to-pink-400',
   },
   {
     name: 'Matech Global',
-    logo: '/clients/matech-logo.png',
     description: 'ICT Solutions',
+    initials: 'MG',
+    color: 'from-amber-500 to-orange-400',
   },
   {
     name: 'TechTrendi',
-    logo: '/clients/techtrendi-logo.png',
     description: 'Tech Platform',
+    initials: 'TT',
+    color: 'from-indigo-500 to-blue-400',
   },
 ];
 
@@ -51,7 +57,7 @@ export const ClientLogosSection = () => {
           </h2>
         </motion.div>
 
-        {/* Client logos grid */}
+        {/* Client cards grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-12">
           {clients.map((client, index) => (
             <motion.div
@@ -63,11 +69,14 @@ export const ClientLogosSection = () => {
               whileHover={{ y: -4, scale: 1.02 }}
               className="group"
             >
-              <div className="h-24 flex flex-col items-center justify-center p-4 rounded-xl bg-card border border-border/50 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
-                <span className="text-base font-semibold text-foreground group-hover:text-primary transition-colors text-center">
+              <div className="h-28 flex flex-col items-center justify-center p-4 rounded-xl bg-card border border-border/50 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
+                <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${client.color} flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300`}>
+                  <span className="text-white text-xs font-bold">{client.initials}</span>
+                </div>
+                <span className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors text-center leading-tight">
                   {client.name}
                 </span>
-                <span className="text-xs text-muted-foreground mt-1 text-center line-clamp-1">
+                <span className="text-[10px] text-muted-foreground mt-0.5 text-center line-clamp-1">
                   {client.description}
                 </span>
               </div>
